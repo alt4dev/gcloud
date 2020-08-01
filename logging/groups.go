@@ -7,12 +7,10 @@ import (
 )
 
 var (
-	instanceId string
 	logGroups map[string]string
 )
 
 func init()  {
-	instanceId = uuid.New().String()
 	logGroups = make(map[string]string, 0)
 }
 
