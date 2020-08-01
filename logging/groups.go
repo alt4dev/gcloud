@@ -29,7 +29,7 @@ func getGroupId() string {
 	return uuid.New().String()
 }
 
-func InitGroup(groupName *string, claims Claim){
+func InitGroup(groupName *string, claims *Claim){
 	routineId := getRoutineId()
 	if _, ok := logGroups[routineId]; ok {
 		alt4warning.Println("Unclosed log group detected. Call `defer CloseGroup()` after `InitGroup()` to avoid memory leaks")
