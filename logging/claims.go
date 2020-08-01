@@ -22,15 +22,18 @@ func parseClaims(claims Claim) []protoClaim {
 		switch i.(type) {
 		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 			claimType = 1
-			claimValue = fmt.Sprint(i.(int))
+			claimValue = fmt.Sprint(i)
 		case float32, float64:
 			claimType = 2
-			claimValue = fmt.Sprint(i.(float64))
-		case string:
+			claimValue = fmt.Sprint(i)
+		case bool:
 			claimType = 3
+			claimValue = fmt.Sprint(i.(bool))
+		case string:
+			claimType = 4
 			claimValue = i.(string)
 		case time.Time:
-			claimType = 4
+			claimType = 5
 			claimValue = fmt.Sprint(i.(time.Time).UnixNano())
 		default:
 			claimType = 0
