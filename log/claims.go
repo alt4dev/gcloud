@@ -2,20 +2,15 @@ package log
 
 import (
 	"fmt"
+	"github.com/alt4dev/protobuff/proto"
 	"time"
 )
 
 type Claim map[string]interface{}
 type C Claim
 
-type protoClaim struct {
-	Name     string
-	DataType uint8
-	Value    string
-}
-
-func parseClaims(claims Claim) []protoClaim {
-	protoClaims := make([]protoClaim, 0)
+func parseClaims(claims Claim) []*proto.Claim {
+	protoClaims := make([]*proto.Claim, 0)
 	for key, i := range claims {
 		var claimValue string
 		var claimType uint8
@@ -39,9 +34,9 @@ func parseClaims(claims Claim) []protoClaim {
 			claimType = 0
 			claimValue = fmt.Sprint(i)
 		}
-		protoClaims = append(protoClaims, protoClaim{
+		protoClaims = append(protoClaims, &proto.Claim{
 			Name:     key,
-			DataType: claimType,
+			DataType: uint32(claimType),
 			Value:    claimValue,
 		})
 	}
