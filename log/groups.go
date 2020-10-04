@@ -1,4 +1,4 @@
-package logging
+package log
 
 import (
 	"github.com/google/uuid"
@@ -29,16 +29,19 @@ func getGroupId() string {
 	return uuid.New().String()
 }
 
-func InitGroup(groupName *string, claims *Claim){
+func InitGroup(groupName *string, claims *Claim) InitGroupResult {
 	routineId := getRoutineId()
 	if _, ok := logGroups[routineId]; ok {
 		alt4warning.Println("Unclosed log group detected. Call `defer CloseGroup()` after `InitGroup()` to avoid memory leaks")
 		delete(logGroups, routineId)
 	}
 	logGroups[routineId] = uuid.New().String()
+	return InitGroupResult{}
 }
 
-func CloseGroup() {
+type InitGroupResult struct {}
+
+func  CloseGroup() {
 	routineId := getRoutineId()
 	if _, ok := logGroups[routineId]; ok {
 		delete(logGroups, routineId)
