@@ -2,6 +2,7 @@ package log
 
 import (
 	"bytes"
+	"github.com/alt4dev/go/service"
 	"os"
 	"runtime/debug"
 	"strings"
@@ -41,9 +42,9 @@ func TestGrouping(t *testing.T){
 
 	// Capture logs from here
 	var buffer bytes.Buffer
-	alt4warning.SetOutput(&buffer)
+	service.EmitWarning.SetOutput(&buffer)
 	defer func(){
-		alt4warning.SetOutput(os.Stderr)
+		service.EmitWarning.SetOutput(os.Stderr)
 	}()
 
 	// Reinitializing a group should delete older group and start a new one

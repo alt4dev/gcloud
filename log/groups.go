@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/alt4dev/go/service"
 	"github.com/google/uuid"
 	"runtime/debug"
 	"strings"
@@ -32,7 +33,7 @@ func getGroupId() string {
 func InitGroup(groupName *string, claims *Claim) InitGroupResult {
 	routineId := getRoutineId()
 	if _, ok := logGroups[routineId]; ok {
-		alt4warning.Println("Unclosed log group detected. Call `defer CloseGroup()` after `InitGroup()` to avoid memory leaks")
+		service.EmitWarning.Println("Unclosed log group detected. Call `defer CloseGroup()` after `InitGroup()` to avoid memory leaks")
 		delete(logGroups, routineId)
 	}
 	logGroups[routineId] = uuid.New().String()
