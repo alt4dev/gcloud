@@ -28,5 +28,5 @@ import (
 
 alt4Service.SetAuthToken("YOUR TOKEN HERE")
 alt4Service.SetMode("release")
-alt4Service.SetDebugOutput(os.Stderr)
+alt4Service.SetSink("default")
 ```
