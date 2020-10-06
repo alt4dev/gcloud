@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
+	"log"
 	"time"
 )
 
@@ -56,4 +57,100 @@ func (claims Claims) Printf(format string, v ...interface{}) *service.LogResult 
 func (claims Claims) Println(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
 	return service.Log(false, message, claims.parse(), LEVEL.DEBUG)
+}
+
+func (claims Claims) Info(v ...interface{}) *service.LogResult {
+	message := fmt.Sprint(v...)
+	return service.Log(false, message, nil, LEVEL.INFO)
+}
+
+func (claims Claims) Infof(format string, v ...interface{}) *service.LogResult {
+	message := fmt.Sprintf(format, v...)
+	return service.Log(false, message, nil, LEVEL.INFO)
+}
+
+func (claims Claims) Infoln(v ...interface{}) *service.LogResult {
+	message := fmt.Sprintln(v...)
+	return service.Log(false, message, nil, LEVEL.INFO)
+}
+
+func (claims Claims) Debug(v ...interface{}) *service.LogResult {
+	message := fmt.Sprint(v...)
+	return service.Log(false, message, nil, LEVEL.DEBUG)
+}
+
+func (claims Claims) Debugf(format string, v ...interface{}) *service.LogResult {
+	message := fmt.Sprintf(format, v...)
+	return service.Log(false, message, nil, LEVEL.DEBUG)
+}
+
+func (claims Claims) Debugln(v ...interface{}) *service.LogResult {
+	message := fmt.Sprintln(v...)
+	return service.Log(false, message, nil, LEVEL.DEBUG)
+}
+
+func (claims Claims) Warning(v ...interface{}) *service.LogResult {
+	message := fmt.Sprint(v...)
+	return service.Log(false, message, nil, LEVEL.WARNING)
+}
+
+func (claims Claims) Warningf(format string, v ...interface{}) *service.LogResult {
+	message := fmt.Sprintf(format, v...)
+	return service.Log(false, message, nil, LEVEL.WARNING)
+}
+
+func (claims Claims) Warningln(v ...interface{}) *service.LogResult {
+	message := fmt.Sprintln(v...)
+	return service.Log(false, message, nil, LEVEL.WARNING)
+}
+
+func (claims Claims) Error(v ...interface{}) *service.LogResult {
+	message := fmt.Sprint(v...)
+	return service.Log(false, message, nil, LEVEL.ERROR)
+}
+
+func (claims Claims) Errorf(format string, v ...interface{}) *service.LogResult {
+	message := fmt.Sprintf(format, v...)
+	return service.Log(false, message, nil, LEVEL.ERROR)
+}
+
+func (claims Claims) Errorln(v ...interface{}) *service.LogResult {
+	message := fmt.Sprintln(v...)
+	return service.Log(false, message, nil, LEVEL.ERROR)
+}
+
+func (claims Claims) Fatal(v ...interface{}) {
+	message := fmt.Sprint(v...)
+	service.Log(false, message, nil, LEVEL.ERROR).Result()
+	log.Fatal(v...)
+}
+
+func (claims Claims) Fatalf(format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
+	service.Log(false, message, nil, LEVEL.ERROR).Result()
+	log.Fatalf(format, v...)
+}
+
+func (claims Claims) Fatalln(v ...interface{}) {
+	message := fmt.Sprintln(v...)
+	service.Log(false, message, nil, LEVEL.ERROR).Result()
+	log.Fatalln(v...)
+}
+
+func (claims Claims) Panic(v ...interface{}) {
+	message := fmt.Sprint(v...)
+	service.Log(false, message, nil, LEVEL.CRITICAL).Result()
+	log.Panic(v...)
+}
+
+func (claims Claims) Panicf(format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
+	service.Log(false, message, nil, LEVEL.CRITICAL).Result()
+	log.Panicf(format, v...)
+}
+
+func (claims Claims) Panicln(v ...interface{}) {
+	message := fmt.Sprintln(v...)
+	service.Log(false, message, nil, LEVEL.CRITICAL).Result()
+	log.Panicln(v...)
 }
