@@ -2,14 +2,14 @@ package log
 
 import (
 	"fmt"
+	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
 	"time"
 )
 
-type Claim map[string]interface{}
-type C Claim
+type Claims map[string]interface{}
 
-func parseClaims(claims Claim) []*proto.Claim {
+func (claims Claims) parse() []*proto.Claim {
 	protoClaims := make([]*proto.Claim, 0)
 	for key, i := range claims {
 		var claimValue string
@@ -41,4 +41,19 @@ func parseClaims(claims Claim) []*proto.Claim {
 		})
 	}
 	return protoClaims
+}
+
+func (claims Claims) Print(v ...interface{}) *service.LogResult {
+	message := fmt.Sprint(v...)
+	return service.Log(false, message, claims.parse(), LEVEL.DEBUG)
+}
+
+func (claims Claims) Printf(format string, v ...interface{}) *service.LogResult {
+	message := fmt.Sprintf(format, v...)
+	return service.Log(false, message, claims.parse(), LEVEL.DEBUG)
+}
+
+func (claims Claims) Println(v ...interface{}) *service.LogResult {
+	message := fmt.Sprintln(v...)
+	return service.Log(false, message, claims.parse(), LEVEL.DEBUG)
 }

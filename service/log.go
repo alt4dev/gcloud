@@ -24,7 +24,7 @@ func (result LogResult) Result() (*proto.Result, error) {
 
 // Log Creates a log entry and writes it to alt4 in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
-func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) LogResult {
+func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *LogResult {
 	if threadInit {
 		initGroup()
 	}
@@ -55,5 +55,5 @@ func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) Lo
 		}
 		result.result, result.error = (*client).Log(context.Background(), &msg)
 	}()
-	return result
+	return &result
 }
