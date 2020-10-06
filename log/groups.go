@@ -2,51 +2,26 @@ package log
 
 import (
 	"github.com/alt4dev/go/service"
-	"github.com/google/uuid"
-	"runtime/debug"
-	"strings"
+	"github.com/alt4dev/protobuff/proto"
 )
 
-var (
-	logGroups map[string]string
-)
-
-func init()  {
-	logGroups = make(map[string]string, 0)
-}
-
-
-func getRoutineId() string {
-	traces := strings.Split(string(debug.Stack()), "\n")
-	return traces[0]
-}
-
-func getGroupId() string {
-	routineId := getRoutineId()
-	if val, ok := logGroups[routineId]; ok {
-		return val
-	}
-	// Return a uuid if not grouped
-	return uuid.New().String()
-}
-
-func InitGroup(groupName *string, claims *Claim) InitGroupResult {
-	routineId := getRoutineId()
-	if _, ok := logGroups[routineId]; ok {
-		service.EmitWarning.Println("Unclosed log group detected. Call `defer CloseGroup()` after `InitGroup()` to avoid memory leaks")
-		delete(logGroups, routineId)
-	}
-	logGroups[routineId] = uuid.New().String()
-	return InitGroupResult{}
-}
-
-type InitGroupResult struct {}
-
-func  CloseGroup() {
-	routineId := getRoutineId()
-	if _, ok := logGroups[routineId]; ok {
-		delete(logGroups, routineId)
+// Group start a log group for the goroutine that calls this function. A group should be closed after. Use: `defer Group(title, claims).Close()`
+// Go routines are used to write logs to alt4 without blocking. You can use the module `sync/log` to write synchronously or call the function `Result` which is going to block if the operation is not done.
+func Group(title string, claims Claim) GroupResult {
+	return GroupResult{
+		logResult: service.Log(true, title, parseClaims(claims), 1),
 	}
 }
 
+// GroupResult Object returned by creating a new log group/thread.
+type GroupResult struct {
+	logResult service.LogResult
+}
 
+func (result GroupResult) Result() (*proto.Result, error) {
+	return result.logResult.Result()
+}
+
+func (result GroupResult) Close() {
+	service.CloseGroup()
+}
