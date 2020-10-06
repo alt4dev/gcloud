@@ -1,12 +1,13 @@
 package log
 
 import (
+	"github.com/alt4dev/protobuff/proto"
 	"github.com/google/go-cmp/cmp"
 	"sort"
 	"testing"
 )
 
-func sortClaims(claims []protoClaim) []protoClaim {
+func sortClaims(claims []*proto.Claim) []*proto.Claim {
 	sort.Slice(claims, func(i, j int) bool {
 		return claims[i].Name < claims[j].Name
 	})
@@ -18,7 +19,7 @@ func TestParseString(t *testing.T) {
 		"name": "John Doe",
 	})
 
-	expectedClaims := []protoClaim{
+	expectedClaims := []proto.Claim{
 		{Name: "name", DataType: 4, Value: "John Doe"},
 	}
 	if !cmp.Equal(alt4Claims, expectedClaims) {
@@ -49,7 +50,7 @@ func TestParsIntegers(t *testing.T) {
 		"int32":  i32,
 		"int64":  i64,
 	}))
-	expectedClaims := sortClaims([]protoClaim{
+	expectedClaims := sortClaims([]*proto.Claim{
 		{Name: "uint", DataType: 1, Value: "1000000000"},
 		{Name: "uint8", DataType: 1, Value: "100"},
 		{Name: "uint16", DataType: 1, Value: "1000"},
@@ -75,7 +76,7 @@ func TestParseFloat(t *testing.T) {
 		"float64": f64,
 	}))
 
-	expectedClaims := sortClaims([]protoClaim{
+	expectedClaims := sortClaims([]*proto.Claim{
 		{Name: "float32", DataType: 2, Value: "35.6"},
 		{Name: "float64", DataType: 2, Value: "77.8"},
 	})
