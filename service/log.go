@@ -11,7 +11,7 @@ import (
 
 // LogResult Object returned when you create a log entry.
 type LogResult struct {
-	wg sync.WaitGroup
+	wg *sync.WaitGroup
 	result *proto.Result
 	error error
 }
@@ -28,6 +28,7 @@ func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *L
 	if threadInit {
 		initGroup()
 	}
+	logTime :=time.Now()
 	// Get the parent file and function of the caller
 	pc, file, line, _ := runtime.Caller(2)
 	function := runtime.FuncForPC(pc).Name()
@@ -41,19 +42,24 @@ func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *L
 		LineNo:     uint32(line),
 		Function: 	function,
 		Level:      uint32(level),
-		Timestamp:  uint64(time.Now().UnixNano()),
+		Timestamp:  uint64(logTime.UnixNano()),
 		AuthToken:  options.AuthToken,
 	}
-
-	result := LogResult{}
+	result := LogResult{
+		wg: &sync.WaitGroup{},
+	}
 	result.wg.Add(1)
-	go func() {
-		defer result.wg.Done()
-		if getClient() == nil {
-			result.error = errors.New("error connecting to remote server")
-			return
-		}
-		result.result, result.error = (*client).Log(context.Background(), &msg)
-	}()
+	go writeToAlt4(&msg, &result)
 	return &result
+}
+
+func writeToAlt4(msg *proto.Message, result *LogResult){
+	//defer result.wg.Done()
+	if getClient() == nil {
+		result.error = errors.New("error connecting to remote server")
+		result.wg.Done()
+		return
+	}
+	result.result, result.error = (*client).Log(context.Background(), msg)
+	result.wg.Done()
 }
