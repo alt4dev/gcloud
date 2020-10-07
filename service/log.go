@@ -13,7 +13,6 @@ import (
 type LogResult struct {
 	wg *sync.WaitGroup
 	result *proto.Result
-	Latency *time.Duration
 	error error
 }
 
@@ -50,11 +49,11 @@ func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *L
 		wg: &sync.WaitGroup{},
 	}
 	result.wg.Add(1)
-	go writeToAlt4(&msg, &result, logTime)
+	go writeToAlt4(&msg, &result)
 	return &result
 }
 
-func writeToAlt4(msg *proto.Message, result *LogResult, logTime time.Time){
+func writeToAlt4(msg *proto.Message, result *LogResult){
 	//defer result.wg.Done()
 	if getClient() == nil {
 		result.error = errors.New("error connecting to remote server")
@@ -62,7 +61,5 @@ func writeToAlt4(msg *proto.Message, result *LogResult, logTime time.Time){
 		return
 	}
 	result.result, result.error = (*client).Log(context.Background(), msg)
-	latency := time.Now().Sub(logTime)
-	result.Latency = &latency
 	result.wg.Done()
 }
