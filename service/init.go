@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var address = "rpc.alt4.dev"
+var address = "rpc.alt4.dev:443"
 var connection *grpc.ClientConn
 var client *proto.LoggingClient
 
