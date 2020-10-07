@@ -13,11 +13,12 @@ import (
 type LogResult struct {
 	wg *sync.WaitGroup
 	result *proto.Result
+	Latency *time.Duration
 	error error
 }
 
 // Result Returns actual result from alt4. This will block and wait for the result if not done
-func (result LogResult) Result() (*proto.Result, error) {
+func (result *LogResult) Result() (*proto.Result, error) {
 	result.wg.Wait()
 	return result.result, result.error
 }
@@ -49,11 +50,11 @@ func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *L
 		wg: &sync.WaitGroup{},
 	}
 	result.wg.Add(1)
-	go writeToAlt4(&msg, &result)
+	go writeToAlt4(&msg, &result, logTime)
 	return &result
 }
 
-func writeToAlt4(msg *proto.Message, result *LogResult){
+func writeToAlt4(msg *proto.Message, result *LogResult, logTime time.Time){
 	//defer result.wg.Done()
 	if getClient() == nil {
 		result.error = errors.New("error connecting to remote server")
@@ -61,5 +62,7 @@ func writeToAlt4(msg *proto.Message, result *LogResult){
 		return
 	}
 	result.result, result.error = (*client).Log(context.Background(), msg)
+	latency := time.Now().Sub(logTime)
+	result.Latency = &latency
 	result.wg.Done()
 }
