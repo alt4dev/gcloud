@@ -33,10 +33,73 @@ alt4Service.SetSink("default")
 
 ### Usage
 This client emulates golang's built in `log` package as much as possible.
-The example below demonstrates this usage:
 ```go
 package main
+import (
 
+"github.com/alt4dev/go/log"
+"time"
+)
+
+func main() {
+    log.Println("Normal logging as you're used to")
+    log.Debugf("A formatted log entry, current time %s", time.Now())
+    log.Warning("Create a log with a Warning severity level")
+    log.Error("Create a log with an error severity level. This won't exit after.")
+    log.Fatal("Logs with a critical severity level then exits with status 1.")
+    log.Panicln("Logs with a critical severity level then panics.")
+}
+```
+
+#### Claims
+Claims are extra data that you want to relate to a log entry but aren't part of the log message.
+This data can be used while filtering for logs from alt4. Claims implement all methods implemented by the `log` package.
+```go
+package main
+import "github.com/alt4dev/go/log"
+
+func main() {
+    log.Claims{
+        "user_id": "user triggering this entry",
+    }.Println("A normal log message")
+
+    log.Claims{
+        "id": "some_id",
+        "name": "Some name here",
+    }.Warning("Just a warning")
+}
+```
+
+#### Grouping
+Grouping can help you resolve issues faster by grouping related logs together.
+Alt4 groups logs based on if they're running from the same goroutine.
+```go
+package main
+import (
+
+"fmt"
+"github.com/alt4dev/go/log"
+)
+
+func processUrl(url string) {
+    // We want logs from each process grouped together even if they run in parallel
+    defer log.Group(fmt.Sprintf("Processing %s", url), log.Claims{"url": url}).Close()
+    log.Println("This log and those after will be grouped under the current routine")
+}
+
+func main() {
+    urls := []string{
+        "http://github.com",
+        "http://google.com",
+        "http://stackoverflow.com",
+        "http://medium.com",
+        "http://gitlab.com",
+    }
+    // Process these URLs in different processes.
+    for _, url := range urls {
+        go processUrl(url)
+    }
+}
 ```
 
 #### Set Default Logger to Write to Alt4
