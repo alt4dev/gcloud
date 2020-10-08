@@ -11,7 +11,8 @@ go get github.com/alt4dev/go
 
 
 #### Authentication and Config
-Alt4 automatically reads config information from the environment. You can configure alt4 in 3 ways:
+Alt4 automatically reads config information from the environment. Auth tokens can be generated from `Settings -> Manage Access -> Application Keys` on <a target="_blank" href="https://app.alt4.dev">app.alt4.dev</a>
+ You can configure alt4 in 3 ways:
 1. **Using a config file:** Pass in the path to the config file via env variable `ALT4_CONFIG`. A config file can be downloaded during token generation.
 
 2. **Using Environment Variables:** The following options can be configured. If set they'll override options set using the config file.
