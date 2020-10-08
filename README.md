@@ -32,7 +32,8 @@ alt4Service.SetSink("default")
 ```
 
 ### Usage
-This client emulates golang's built in `log` package as much as possible.
+This client emulates golang's built in `log` package as much as possible. Logs are written asynchronously to alt4.
+If you're running on a system that doesn't allow background processes(goroutines). Import from our sync package(`github.com/alt4dev/go/sync/log`) instead which writes logs synchronously.
 ```go
 package main
 import (
