@@ -9,7 +9,7 @@ import (
 // Go routines are used to write logs to alt4 without blocking. You can use the module `sync/log` to write synchronously or call the function `Result` which is going to block if the operation is not done.
 func Group(title string, claims Claims) GroupResult {
 	return GroupResult{
-		logResult: service.Log(true, title, claims.parse(), 1),
+		logResult: service.Log(2,true, title, claims.parse(), 1),
 	}
 }
 
