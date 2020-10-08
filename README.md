@@ -9,7 +9,7 @@
 go get github.com/alt4dev/go
 ```
 
-### Usage
+
 #### Authentication and Config
 Alt4 automatically reads config information from the environment. You can configure alt4 in 3 ways:
 1. **Using a config file:** Pass in the path to the config file via env variable `ALT4_CONFIG`. A config file can be downloaded during token generation.
@@ -22,11 +22,46 @@ Alt4 automatically reads config information from the environment. You can config
 ```go
 package main
 import (
- alt4Service "github.com/alt4dev/go/service"
- "os"
+    alt4Service "github.com/alt4dev/go/service"
 )
 
 alt4Service.SetAuthToken("YOUR TOKEN HERE")
 alt4Service.SetMode("release")
 alt4Service.SetSink("default")
+```
+
+### Usage
+This client emulates golang's built in `log` package as much as possible.
+The example below demonstrates this usage:
+```go
+package main
+
+```
+
+#### Set Default Logger to Write to Alt4
+This is the quickest way to get started with alt4 without importing the library in every file that you do log from.
+This is the recommended path for a pre-existing code base without the intention to use claims in logs.
+
+This achieved by providing the following writer interfaces:
+- **`github.com/alt4dev/go/service.Writer`** This writer receives a log message and writes it asynchronously to alt4.
+- **`github.com/alt4dev/go/service.SyncWriter`** This writer writes synchronously, i.e. blocks as the log is written.
+This is only recommended in environments where background processes aren't allowed or are discouraged, e.g. google cloud run.
+
+The example below demonstrates the usage of both writers:
+```go
+package main
+import (
+    alt4Service "github.com/alt4dev/go/service"
+    "log"
+)
+
+func main() {
+    // Set default logger to use alt4
+    log.SetOutput(alt4Service.Writer)
+    log.Println("This writes to alt4")
+    
+    // Set a custom logger to use alt4
+    logger := log.New(alt4Service.SyncWriter, "[my custom logger]", 0)
+    logger.Println("This writes synchronously to alt4")
+}
 ```
