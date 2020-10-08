@@ -24,13 +24,13 @@ func (result *LogResult) Result() (*proto.Result, error) {
 
 // Log Creates a log entry and writes it to alt4 in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
-func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *LogResult {
+func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, level uint8) *LogResult {
 	if threadInit {
 		initGroup()
 	}
 	logTime :=time.Now()
 	// Get the parent file and function of the caller
-	pc, file, line, _ := runtime.Caller(2)
+	pc, file, line, _ := runtime.Caller(calldepth)
 	function := runtime.FuncForPC(pc).Name()
 	msg := proto.Message{
 		ThreadId:   getThreadId(),
@@ -54,12 +54,26 @@ func Log(threadInit bool, message string, claims []*proto.Claim, level uint8) *L
 }
 
 func writeToAlt4(msg *proto.Message, result *LogResult){
-	//defer result.wg.Done()
 	if getClient() == nil {
 		result.error = errors.New("error connecting to remote server")
+		emitLog(msg, result.error)
 		result.wg.Done()
 		return
 	}
 	result.result, result.error = (*client).Log(context.Background(), msg)
+	if (result.result != nil && !result.result.Acknowledged) || options.Mode == "debug" || result.error != nil {
+		if result.result != nil && !result.result.Acknowledged {
+			result.error = errors.New(result.result.Message)
+		}
+		emitLog(msg, result.error)
+	}
 	result.wg.Done()
+}
+
+func emitLog(msg *proto.Message, err error) {
+	if err != nil {
+		EmitError.Println(err)
+	}
+	timeString := time.Unix(0, int64(msg.Timestamp)).Format("2021-12-15 13:45:45.000")
+	Emit.Printf("[Alt4] %s %s:%d %s\n", timeString, msg.FileName, msg.LineNo, msg.Message)
 }

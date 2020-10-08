@@ -5,6 +5,7 @@ import (
 	"github.com/alt4dev/protobuff/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"io"
 	"io/ioutil"
 	"os"
 )
@@ -15,16 +16,16 @@ var client *proto.LoggingClient
 
 type Alt4Options struct {
 	AuthToken string
-	Mode string
-	Sink string
-	EmmitFile *os.File
+	Mode      string
+	Sink      string
+	Writer    io.Writer
 }
 
 var options = Alt4Options{
 	AuthToken: "",
-	Mode: "release",
-	Sink: "default",
-	EmmitFile: os.Stderr,
+	Mode:      "release",
+	Sink:      "default",
+	Writer:    os.Stderr,
 }
 
 func init() {
@@ -97,6 +98,6 @@ func SetSink(sink string) {
 	}
 }
 
-func SetDebugOutput(file *os.File){
-	options.EmmitFile = file
+func SetDebugOutput(w io.Writer){
+	options.Writer = w
 }
