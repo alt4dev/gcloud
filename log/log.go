@@ -6,6 +6,8 @@ import (
 	"log"
 )
 
+var LEVEL = service.LEVEL
+
 func Print(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
 	return service.Log(2, false, message, nil, LEVEL.DEBUG)

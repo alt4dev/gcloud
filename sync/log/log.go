@@ -2,13 +2,12 @@ package log
 
 import (
 	"fmt"
-	alt4log "github.com/alt4dev/go/log"
 	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
 	"log"
 )
 
-var LEVEL = alt4log.LEVEL
+var LEVEL = service.LEVEL
 
 func Print(v ...interface{}) (*proto.Result, error) {
 	message := fmt.Sprint(v...)

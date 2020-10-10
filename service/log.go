@@ -80,7 +80,7 @@ func emitLog(msg *proto.Message, err error) {
 		EmitError.Println(err)
 	}
 	timeString := time.Unix(0, int64(msg.Timestamp)).Format("2021-12-15 13:45:45.000")
-	message := fmt.Sprintf("%s %s:%d %s", timeString, msg.FileName, msg.LineNo, msg.Message)
+	message := fmt.Sprintf("%s %s %s:%d %s", levelString[uint8(msg.Level)], timeString, msg.FileName, msg.LineNo, msg.Message)
 	lines := []string{message}
 	for _, claim := range msg.Claims {
 		lines = append(lines, fmt.Sprintf("\tclaim.%s: '%s'", claim.Name, claim.Value))
