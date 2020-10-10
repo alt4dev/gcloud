@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/alt4dev/protobuff/proto"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
@@ -60,8 +62,11 @@ func writeToAlt4(msg *proto.Message, result *LogResult){
 		result.wg.Done()
 		return
 	}
-	result.result, result.error = (*client).Log(context.Background(), msg)
-	if (result.result != nil && !result.result.Acknowledged) || options.Mode == "debug" || result.error != nil {
+	if options.Mode != "testing" {
+		result.result, result.error = (*client).Log(context.Background(), msg)
+	}
+	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
+	if (result.result != nil && !result.result.Acknowledged) || shouldEmit || result.error != nil {
 		if result.result != nil && !result.result.Acknowledged {
 			result.error = errors.New(result.result.Message)
 		}
@@ -75,5 +80,10 @@ func emitLog(msg *proto.Message, err error) {
 		EmitError.Println(err)
 	}
 	timeString := time.Unix(0, int64(msg.Timestamp)).Format("2021-12-15 13:45:45.000")
-	Emit.Printf("[Alt4] %s %s:%d %s\n", timeString, msg.FileName, msg.LineNo, msg.Message)
+	message := fmt.Sprintf("%s %s:%d %s", timeString, msg.FileName, msg.LineNo, msg.Message)
+	lines := []string{message}
+	for _, claim := range msg.Claims {
+		lines = append(lines, fmt.Sprintf("\tclaim.%s: '%s'", claim.Name, claim.Value))
+	}
+	Emit.Println(strings.Join(lines, "\n"))
 }

@@ -17,7 +17,11 @@ Alt4 automatically reads config information from the environment. Auth tokens ca
 
 2. **Using Environment Variables:** The following options can be configured. If set they'll override options set using the config file.
     - `ALT4_AUTH_TOKEN` A token string used to authorize your request to alt4
-    - `ALT4_MODE` This is either `release` or `debug` with the default set to `release`. Under `debug` mode, a log entry will be written to stderr/(specified emit file) in addition to being sent to alt4.
+    - `ALT4_MODE` This controls the amount of ouptut alt4 emits to `stderr`. The following modes can be used:
+        - `release`(default) - Under this mode all logs will be sent to alt4 without logging the logs to `stderr`
+        unless there's a connection/authentication error.
+        - `debug` Under this mode logs will be sent to alt4 and written to `stderr`.
+        - `testing` Under this mode logs will only be emitted to `stderr` and not sent to alt4. We use this mode to develop our products locally.
     - `ALT4_SINK` A string specifying a sink to log the logs under. By default, logs entries will be logged to the sink `default`.
 3. **Set options from the code**
 ```go

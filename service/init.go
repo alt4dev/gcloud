@@ -87,7 +87,7 @@ func SetAuthToken(token string) {
 }
 
 func SetMode(mode string) {
-	if mode == "release" || mode == "debug" {
+	if mode == "release" || mode == "debug" || mode == "testing" {
 		options.Mode = mode
 	}
 }
