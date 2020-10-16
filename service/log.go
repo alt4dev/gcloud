@@ -24,6 +24,38 @@ func (result *LogResult) Result() (*proto.Result, error) {
 	return result.result, result.error
 }
 
+// RemoteWriter an interface for functions called when writing to alt4.
+// You can implement this function to mock writes to alt4 for better testing of your system.
+type RemoteWriter interface {
+	// Write function will be called with the Message to be sent to alt4 and an empty result to fill once done
+	Write(msg *proto.Message, result *LogResult)
+}
+
+type writer struct {}
+func (w writer) Write(msg *proto.Message, result *LogResult) {
+	if getClient() == nil {
+		result.error = errors.New("error connecting to remote server")
+		emitLog(msg, result.error)
+		result.wg.Done()
+		return
+	}
+	if options.Mode != "testing" {
+		result.result, result.error = (*client).Log(context.Background(), msg)
+	}
+	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
+	if (result.result != nil && !result.result.Acknowledged) || shouldEmit || result.error != nil {
+		if result.result != nil && !result.result.Acknowledged {
+			result.error = errors.New(result.result.Message)
+		}
+		emitLog(msg, result.error)
+	}
+	result.wg.Done()
+}
+
+
+// Alt4RemoteWriter For testing purposes, implement your own RemoteWriter and equate it to this variable
+var Alt4RemoteWriter RemoteWriter = writer{}
+
 // Log Creates a log entry and writes it to alt4 in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
 func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, level uint8) *LogResult {
@@ -51,28 +83,8 @@ func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, 
 		wg: &sync.WaitGroup{},
 	}
 	result.wg.Add(1)
-	go writeToAlt4(&msg, &result)
+	go Alt4RemoteWriter.Write(&msg, &result)
 	return &result
-}
-
-func writeToAlt4(msg *proto.Message, result *LogResult){
-	if getClient() == nil {
-		result.error = errors.New("error connecting to remote server")
-		emitLog(msg, result.error)
-		result.wg.Done()
-		return
-	}
-	if options.Mode != "testing" {
-		result.result, result.error = (*client).Log(context.Background(), msg)
-	}
-	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
-	if (result.result != nil && !result.result.Acknowledged) || shouldEmit || result.error != nil {
-		if result.result != nil && !result.result.Acknowledged {
-			result.error = errors.New(result.result.Message)
-		}
-		emitLog(msg, result.error)
-	}
-	result.wg.Done()
 }
 
 func emitLog(msg *proto.Message, err error) {
