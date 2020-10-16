@@ -13,43 +13,43 @@ import (
 
 // LogResult Object returned when you create a log entry.
 type LogResult struct {
-	wg *sync.WaitGroup
-	result *proto.Result
-	error error
+	WG  *sync.WaitGroup
+	R   *proto.Result
+	Err error
 }
 
-// Result Returns actual result from alt4. This will block and wait for the result if not done
+// Result Returns actual R from alt4. This will block and wait for the R if not done
 func (result *LogResult) Result() (*proto.Result, error) {
-	result.wg.Wait()
-	return result.result, result.error
+	result.WG.Wait()
+	return result.R, result.Err
 }
 
 // RemoteWriter an interface for functions called when writing to alt4.
 // You can implement this function to mock writes to alt4 for better testing of your system.
 type RemoteWriter interface {
-	// Write function will be called with the Message to be sent to alt4 and an empty result to fill once done
+	// Write function will be called with the Message to be sent to alt4 and an empty R to fill once done
 	Write(msg *proto.Message, result *LogResult)
 }
 
 type writer struct {}
 func (w writer) Write(msg *proto.Message, result *LogResult) {
 	if getClient() == nil {
-		result.error = errors.New("error connecting to remote server")
-		emitLog(msg, result.error)
-		result.wg.Done()
+		result.Err = errors.New("error connecting to remote server")
+		emitLog(msg, result.Err)
+		result.WG.Done()
 		return
 	}
 	if options.Mode != "testing" {
-		result.result, result.error = (*client).Log(context.Background(), msg)
+		result.R, result.Err = (*client).Log(context.Background(), msg)
 	}
 	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
-	if (result.result != nil && !result.result.Acknowledged) || shouldEmit || result.error != nil {
-		if result.result != nil && !result.result.Acknowledged {
-			result.error = errors.New(result.result.Message)
+	if (result.R != nil && !result.R.Acknowledged) || shouldEmit || result.Err != nil {
+		if result.R != nil && !result.R.Acknowledged {
+			result.Err = errors.New(result.R.Message)
 		}
-		emitLog(msg, result.error)
+		emitLog(msg, result.Err)
 	}
-	result.wg.Done()
+	result.WG.Done()
 }
 
 
@@ -80,9 +80,9 @@ func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, 
 		AuthToken:  options.AuthToken,
 	}
 	result := LogResult{
-		wg: &sync.WaitGroup{},
+		WG: &sync.WaitGroup{},
 	}
-	result.wg.Add(1)
+	result.WG.Add(1)
 	go Alt4RemoteWriter.Write(&msg, &result)
 	return &result
 }
