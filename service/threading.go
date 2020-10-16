@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"runtime/debug"
 	"strings"
+	"sync"
 )
 
 /*
@@ -13,9 +14,11 @@ goroutine and put those logs in the same group
 */
 
 var threads map[string]string
+var waitGroups map[string] *sync.WaitGroup
 
 func init()  {
-	threads = make(map[string]string, 0)
+	threads = map[string]string{}
+	waitGroups = map[string]*sync.WaitGroup{}
 }
 
 func getRoutineId() string {
@@ -42,10 +45,24 @@ func initGroup() {
 }
 
 func CloseGroup() {
+	// Before closing a group. Wait for all logs to finish writing.
+	WaitGroup().Wait()
+
 	routineId := getRoutineId()
 	if _, ok := threads[routineId]; ok {
 		delete(threads, routineId)
 	}
 }
 
+// Provide wait groups per go routine ID. Closing a group will wait for all write ops to finish.
+func WaitGroup() *sync.WaitGroup {
+	routineId := getRoutineId()
+	wg, ok := waitGroups[routineId]
+	if ok {
+		return wg
+	}
+	wg = &sync.WaitGroup{}
+	waitGroups[routineId] = wg
+	return wg
+}
 

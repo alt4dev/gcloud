@@ -13,14 +13,14 @@ import (
 
 // LogResult Object returned when you create a log entry.
 type LogResult struct {
-	WG  *sync.WaitGroup
 	R   *proto.Result
+	wg *sync.WaitGroup
 	Err error
 }
 
 // Result Returns actual R from alt4. This will block and wait for the R if not done
 func (result *LogResult) Result() (*proto.Result, error) {
-	result.WG.Wait()
+	result.wg.Wait()
 	return result.R, result.Err
 }
 
@@ -31,12 +31,12 @@ type RemoteWriter interface {
 	Write(msg *proto.Message, result *LogResult)
 }
 
-type writer struct {}
+type writer struct{}
+
 func (w writer) Write(msg *proto.Message, result *LogResult) {
 	if getClient() == nil {
 		result.Err = errors.New("error connecting to remote server")
 		emitLog(msg, result.Err)
-		result.WG.Done()
 		return
 	}
 	if options.Mode != "testing" {
@@ -49,9 +49,7 @@ func (w writer) Write(msg *proto.Message, result *LogResult) {
 		}
 		emitLog(msg, result.Err)
 	}
-	result.WG.Done()
 }
-
 
 // Alt4RemoteWriter For testing purposes, implement your own RemoteWriter and equate it to this variable
 var Alt4RemoteWriter RemoteWriter = writer{}
@@ -62,7 +60,7 @@ func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, 
 	if threadInit {
 		initGroup()
 	}
-	logTime :=time.Now()
+	logTime := time.Now()
 	// Get the parent file and function of the caller
 	pc, file, line, _ := runtime.Caller(calldepth)
 	function := runtime.FuncForPC(pc).Name()
@@ -74,17 +72,22 @@ func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, 
 		Claims:     claims,
 		FileName:   file,
 		LineNo:     uint32(line),
-		Function: 	function,
+		Function:   function,
 		Level:      uint32(level),
 		Timestamp:  uint64(logTime.UnixNano()),
 		AuthToken:  options.AuthToken,
 	}
 	result := LogResult{
-		WG: &sync.WaitGroup{},
+		wg: WaitGroup(),
 	}
-	result.WG.Add(1)
-	go Alt4RemoteWriter.Write(&msg, &result)
+	WaitGroup().Add(1)
+	go writerHelper(&msg, &result)
 	return &result
+}
+
+func writerHelper(msg *proto.Message, result *LogResult) {
+	defer result.wg.Done()
+	Alt4RemoteWriter.Write(msg, result)
 }
 
 func emitLog(msg *proto.Message, err error) {
