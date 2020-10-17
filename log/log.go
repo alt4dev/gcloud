@@ -60,7 +60,7 @@ func Infof(format string, v ...interface{}) *service.LogResult {
 	return service.Log(2, false, message, nil, LEVEL.INFO)
 }
 
-// Infoln send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprint(a...)
+// Infoln send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
 func Infoln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
 	return service.Log(2, false, message, nil, LEVEL.INFO)
@@ -78,6 +78,7 @@ func Debugf(format string, v ...interface{}) *service.LogResult {
 	return service.Log(2, false, message, nil, LEVEL.DEBUG)
 }
 
+// Debugln send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
 func Debugln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
 	return service.Log(2, false, message, nil, LEVEL.DEBUG)
@@ -95,6 +96,7 @@ func Warningf(format string, v ...interface{}) *service.LogResult {
 	return service.Log(2, false, message, nil, LEVEL.WARNING)
 }
 
+// Warningln send a log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprintln(a...)
 func Warningln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
 	return service.Log(2, false, message, nil, LEVEL.WARNING)
@@ -112,6 +114,7 @@ func Errorf(format string, v ...interface{}) *service.LogResult {
 	return service.Log(2, false, message, nil, LEVEL.ERROR)
 }
 
+// Errorln send a log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprintln(a...)
 func Errorln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
 	return service.Log(2, false, message, nil, LEVEL.ERROR)
