@@ -38,7 +38,7 @@ func getThreadId() string {
 func initGroup() {
 	routineId := getRoutineId()
 	if _, ok := threads[routineId]; ok {
-		EmitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(title, claims).Close()`")
+		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(title, claims).Close()`")
 		delete(threads, routineId)
 	}
 	threads[routineId] = getThreadId()

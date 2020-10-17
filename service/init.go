@@ -41,7 +41,7 @@ func getClient() *proto.LoggingClient {
 		transCert := grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "rpc.alt4.dev"))
 		connection, err = grpc.Dial(address, transCert)
 		if err != nil {
-			EmitError.Println("Error creating a connection to alt4. Error: ", err)
+			emitError.Println("Error creating a connection to alt4. Error: ", err)
 			connection = nil
 			client = nil
 			return nil
@@ -57,7 +57,7 @@ func setupOptions() {
 	if optionsFile != "" {
 		jsonContent, err := ioutil.ReadFile(optionsFile)
 		if err != nil {
-			EmitError.Printf("Error opening file `%s` provided in ALT4_CONFIG. Error: %s\n", optionsFile, err)
+			emitError.Printf("Error opening file `%s` provided in ALT4_CONFIG. Error: %s\n", optionsFile, err)
 		}else {
 			content := struct {
 				Token     string `json:"token" binding:"required"`
@@ -66,7 +66,7 @@ func setupOptions() {
 			}{}
 			err = json.Unmarshal(jsonContent, &content)
 			if err != nil {
-				EmitError.Println("Error decoding ALT4_CONFIG. Error: ", err)
+				emitError.Println("Error decoding ALT4_CONFIG. Error: ", err)
 			}else {
 				SetAuthToken(content.Token)
 				SetMode(content.Mode)

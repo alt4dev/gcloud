@@ -67,10 +67,10 @@ func TestGrouping(t *testing.T) {
 	}
 
 	f, _ := os.Open(os.DevNull)
-	EmitWarning.SetOutput(f) // suppress warning log
+	emitWarning.SetOutput(f) // suppress warning log
 	// Confirm that initializing a group without closing replaces the older one
 	initGroup()
-	EmitWarning.SetOutput(options.Writer) // restore
+	emitWarning.SetOutput(options.Writer) // restore
 	newThreadId := getThreadId()
 	if newThreadId == currentThread {
 		t.Error("Thread ID's should change after initializing an existing group")

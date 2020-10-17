@@ -18,7 +18,7 @@ type LogResult struct {
 	Err error
 }
 
-// Result Returns actual R from alt4. This will block and wait for the R if not done
+// Result Returns actual Result from alt4. This will block and wait for the Result if not done
 func (result *LogResult) Result() (*proto.Result, error) {
 	result.wg.Wait()
 	return result.R, result.Err
@@ -92,7 +92,7 @@ func writerHelper(msg *proto.Message, result *LogResult) {
 
 func emitLog(msg *proto.Message, err error) {
 	if err != nil {
-		EmitError.Println(err)
+		emitError.Println(err)
 	}
 	timeString := time.Unix(0, int64(msg.Timestamp)).Format("2006-01-02T15:04:05.000Z")
 	message := fmt.Sprintf("[alt4 %s] %s %s:%d %s", levelString[uint8(msg.Level)], timeString, msg.FileName, msg.LineNo, msg.Message)
@@ -100,5 +100,5 @@ func emitLog(msg *proto.Message, err error) {
 	for _, claim := range msg.Claims {
 		lines = append(lines, fmt.Sprintf("\tclaim.%s: '%s'", claim.Name, claim.Value))
 	}
-	Emit.Println(strings.Join(lines, "\n"))
+	emit.Println(strings.Join(lines, "\n"))
 }
