@@ -9,7 +9,6 @@
 go get github.com/alt4dev/go
 ```
 
-
 #### Authentication and Config
 Alt4 automatically reads config information from the environment. Auth tokens can be generated from `Settings -> Manage Access -> Application Keys` on <a target="_blank" href="https://app.alt4.dev">app.alt4.dev</a>
  You can configure alt4 in 3 ways:
@@ -36,14 +35,15 @@ alt4Service.SetSink("default")
 ```
 
 ### Usage
-This client emulates golang's built in `log` package as much as possible. Logs are written asynchronously to alt4.
-If you're running on a system that doesn't allow background processes(goroutines). Import from our sync package(`github.com/alt4dev/go/sync/log`) instead which writes logs synchronously.
+This client emulates golang's built in `log` package as much as possible. Logs will be written asynchronously to alt4.
+If you're running on a system that doesn't allow background processes(goroutines) e.g. google cloud run,
+we recommend using [log grouping](#grouping) and making sure you defer close group. This will wait for all writes to complete.
+You can call the function `Result` after a log to wait for the writing to finish.
 ```go
 package main
 import (
-
-"github.com/alt4dev/go/log"
-"time"
+    "github.com/alt4dev/go/log"
+    "time"
 )
 
 func main() {
@@ -81,15 +81,17 @@ Alt4 groups logs based on if they're running from the same goroutine.
 ```go
 package main
 import (
-
-"fmt"
-"github.com/alt4dev/go/log"
+    "fmt"
+    "github.com/alt4dev/go/log"
 )
 
 func processUrl(url string) {
     // We want logs from each process grouped together even if they run in parallel
-    defer log.Group(fmt.Sprintf("Processing %s", url), log.Claims{"url": url}).Close()
+    defer log.Group(fmt.Sprintf("Processing %s", url)).Close()
     log.Println("This log and those after will be grouped under the current routine")
+
+    // You can also create a group with claims
+    defer log.Claims{"url": url}.Group("Processing ", url).Close()
 }
 
 func main() {
