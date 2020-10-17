@@ -1,8 +1,9 @@
 <a href="https://alt4.dev"><img src="https://alt4.dev/banner.svg" alt="" height="120"></a>
 
+[![codecov](https://codecov.io/gh/alt4dev/go/branch/master/graph/badge.svg)](https://codecov.io/gh/alt4dev/go)
+
 ## Golang Logging Client
 
-[![codecov](https://codecov.io/gh/alt4dev/go/branch/master/graph/badge.svg)](https://codecov.io/gh/alt4dev/go)
 **Go lang logging client for <a href="https://alt4.dev">Alt4.dev</a>**
 
 ### Install
