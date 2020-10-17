@@ -1,3 +1,4 @@
+// Package service is used to write logs to alt4.
 package service
 
 import (
@@ -14,14 +15,12 @@ var address = "rpc.alt4.dev:443"
 var connection *grpc.ClientConn
 var client *proto.LoggingClient
 
-type Alt4Options struct {
+var options = struct {
 	AuthToken string
 	Mode      string
 	Sink      string
 	Writer    io.Writer
-}
-
-var options = Alt4Options{
+}{
 	AuthToken: "",
 	Mode:      "release",
 	Sink:      "default",
@@ -80,24 +79,38 @@ func setupOptions() {
 	SetSink(os.Getenv("ALT4_SINK"))
 }
 
+// SetAuthToken Used to set the auth token for writing to alt4.
+// This setting can be done via config file ALT4_CONFIG or setting environment variable ALT4_AUTH_TOKEN
 func SetAuthToken(token string) {
 	if token != "" {
 		options.AuthToken = token
 	}
 }
 
+// SetMode Sets the behaviour of alt4 based on the following:
+// `release` - Under this mode logs are written to alt4 and not emitted to stdout
+// `debug` - Under this mode logs are written to alt4 and emitted to stdout
+// `testing` - Under this mode logs are not written to alt4, just emitted to stdout
+// `json`(coming soon) - Under this mode all logs are written to a JSON file which you can later upload to alt4
+// Mode can also be set via a config file ALT4_CONFIG or setting environment variable ALT4_MODE
+// Default mode is `release`
 func SetMode(mode string) {
 	if mode == "release" || mode == "debug" || mode == "testing" {
 		options.Mode = mode
 	}
 }
 
+// SetSink Sets the sink to write your logs to
+// Sinks can help you distinguish logs from different sources e.g. Languages, services, servers e.t.c.
+// Default sink is `default`
 func SetSink(sink string) {
 	if sink != "" {
 		options.Sink = sink
 	}
 }
 
+// SetDebugOutput Is used to specify where alt4 emits additional output e.g. when facing network errors.
+// Defaults os.Stderr
 func SetDebugOutput(w io.Writer){
 	options.Writer = w
 }
