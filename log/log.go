@@ -3,10 +3,20 @@ package log
 import (
 	"fmt"
 	"github.com/alt4dev/go/service"
-	"log"
+	"os"
 )
 
 var LEVEL = service.LEVEL
+
+// Override for testing
+var builtInPanic func(v interface{}) = func(v interface{}) {
+	panic(v)
+}
+
+// Override for testing
+var builtInExit func(code int) = func(code int) {
+	os.Exit(code)
+}
 
 func Print(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
@@ -85,36 +95,36 @@ func Errorln(v ...interface{}) *service.LogResult {
 
 func Fatal(v ...interface{}) {
 	message := fmt.Sprint(v...)
-	service.Log(2, false, message, nil, LEVEL.ERROR).Result()
-	log.Fatal(v...)
+	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
+	builtInExit(1)
 }
 
 func Fatalf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
-	service.Log(2, false, message, nil, LEVEL.ERROR).Result()
-	log.Fatalf(format, v...)
+	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
+	builtInExit(1)
 }
 
 func Fatalln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
-	service.Log(2, false, message, nil, LEVEL.ERROR).Result()
-	log.Fatalln(v...)
+	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
+	builtInExit(1)
 }
 
 func Panic(v ...interface{}) {
 	message := fmt.Sprint(v...)
 	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
-	log.Panic(v...)
+	builtInPanic(message)
 }
 
 func Panicf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
 	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
-	log.Panicf(format, v...)
+	builtInPanic(message)
 }
 
 func Panicln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
 	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
-	log.Panicln(v...)
+	builtInPanic(message)
 }
