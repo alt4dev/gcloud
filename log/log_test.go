@@ -5,6 +5,7 @@ import (
 	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
 	"runtime"
+	"sort"
 	"testing"
 )
 
@@ -47,10 +48,22 @@ func setUp(t *testing.T, level uint8, isGroup bool, claims []*proto.Claim) {
 		if msg.ThreadInit != isGroup {
 			t.Errorf("Expected thread init to be %v but found %v", isGroup, msg.ThreadInit)
 		}
-		if fmt.Sprint(claims) != fmt.Sprint(msg.Claims) {
+		if (claims == nil && msg.Claims != nil) || (claims != nil && msg.Claims == nil) {
 			t.Errorf("Claims don't match")
 			t.Log("Expected: ", claims)
 			t.Log("Found: ", msg.Claims)
+		}else {
+			sort.Slice(claims, func(i, j int) bool {
+				return claims[i].Name < claims[j].Name
+			})
+			sort.Slice(msg.Claims, func(i, j int) bool {
+				return msg.Claims[i].Name < msg.Claims[j].Name
+			})
+			if fmt.Sprint(claims) != fmt.Sprint(msg.Claims) {
+				t.Errorf("Claims don't match")
+				t.Log("Expected: ", claims)
+				t.Log("Found: ", msg.Claims)
+			}
 		}
 	}
 }
