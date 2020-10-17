@@ -16,5 +16,13 @@ func (writer alt4SyncWriter) Write(p []byte) (n int, err error) {
 	return len(p), _err
 }
 
+// Writer can be used to override a normal/default go logger to write it's output to alt4
+// This method writes logs asynchronously. Opening and Closing a group at the end of your routines ensure waits for all writes to finish.
+// Example log.SetOutput(Writer)
 var Writer = alt4Writer{}
+
+// SyncWriter can be used to override a normal/default go logger to write it's output to alt4
+// This method writes logs synchronously.
+// Unless you really need to we instead advice on Opening and Closing a group at the end of your routines which will wait for all writes started within the routine to complete
+// Example log.SetOutput(SyncWriter)
 var SyncWriter = alt4SyncWriter{}
