@@ -7,9 +7,9 @@ import (
 )
 
 var writeMock func(msg *proto.Message)
-type RemoteWriterMock struct {}
+type remoteWriterMock struct {}
 
-func (w RemoteWriterMock) Write(msg *proto.Message, result *LogResult) {
+func (w remoteWriterMock) Write(msg *proto.Message, result *LogResult) {
 	writeMock(msg)
 	result.R = &proto.Result{
 		Acknowledged: true,
@@ -20,7 +20,7 @@ func (w RemoteWriterMock) Write(msg *proto.Message, result *LogResult) {
 
 func TestOverrideDefaultLogOutputSync(t *testing.T) {
 	syncLogger := log.New(SyncWriter, "alt4async ", 0)
-	Alt4RemoteWriter = RemoteWriterMock{}
+	Alt4RemoteWriter = remoteWriterMock{}
 
 	writeMock = func(msg *proto.Message) {
 		if msg.Message != "alt4async This is a sync test i.e. will wait for result\n" {
@@ -36,7 +36,7 @@ func TestOverrideDefaultLogOutputAsync(t *testing.T) {
 	defer WaitGroup().Wait()
 	// The default logger writes to alt4
 	asyncLogger := log.New(Writer, "alt4async ", 0)
-	Alt4RemoteWriter = RemoteWriterMock{}
+	Alt4RemoteWriter = remoteWriterMock{}
 
 	writeMock = func(msg *proto.Message) {
 		if msg.Message != "alt4async This is an async test i.e. will write and forget\n" {
