@@ -13,8 +13,8 @@ var LEVEL = struct {
 	DEBUG:   1,
 	WARNING: 2,
 	ERROR:   3,
-	FATAL:   4,
-	CRITICAL: 5,
+	CRITICAL: 4,
+	FATAL:   5,
 }
 
 var levelString = map[uint8]string {
@@ -22,6 +22,6 @@ var levelString = map[uint8]string {
 	LEVEL.DEBUG: "DEBUG",
 	LEVEL.WARNING: "WARNING",
 	LEVEL.ERROR: "ERROR",
-	LEVEL.FATAL: "FATAL",
 	LEVEL.CRITICAL: "PANIC",
+	LEVEL.FATAL: "FATAL",
 }
