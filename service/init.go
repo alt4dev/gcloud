@@ -58,7 +58,7 @@ func setupOptions() {
 	if optionsFile != "" {
 		jsonContent, err := ioutil.ReadFile(optionsFile)
 		if err != nil {
-			EmitError.Print("Error opening file provided in ALT4_CONFIG. Error: ", err)
+			EmitError.Printf("Error opening file `%s` provided in ALT4_CONFIG. Error: %s\n", optionsFile, err)
 		}else {
 			content := struct {
 				Token     string `json:"token" binding:"required"`
