@@ -2,9 +2,7 @@
 
 [![codecov](https://codecov.io/gh/alt4dev/go/branch/master/graph/badge.svg)](https://codecov.io/gh/alt4dev/go)
 
-## Golang Logging Client
-
-**Go lang logging client for <a href="https://alt4.dev">Alt4.dev</a>**
+## Golang Logging Client, [Docs](https://pkg.go.dev/mod/github.com/alt4dev/go)
 
 ### Install
 ```shell script
