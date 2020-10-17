@@ -110,27 +110,27 @@ func (claims Claims) Errorln(v ...interface{}) *service.LogResult {
 	return service.Log(2, false, message, claims.parse(), LEVEL.ERROR)
 }
 
-// Fatal This is equivalent to calling Print followed by os.Exit(1). The log level is CRITICAL.
+// Fatal This is equivalent to calling Print followed by os.Exit(1). The log level is FATAL.
 // This method will wait for the write to complete
 func (claims Claims) Fatal(v ...interface{}) {
 	message := fmt.Sprint(v...)
-	service.Log(2, false, message, claims.parse(), LEVEL.ERROR).Result()
+	service.Log(2, false, message, claims.parse(), LEVEL.FATAL).Result()
 	BuiltInExit(1)
 }
 
-// Fatalf This is equivalent to calling Printf followed by os.Exit(1). The log level is CRITICAL.
+// Fatalf This is equivalent to calling Printf followed by os.Exit(1). The log level is FATAL.
 // This method will wait for the write to complete
 func (claims Claims) Fatalf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
-	service.Log(2, false, message, claims.parse(), LEVEL.ERROR).Result()
+	service.Log(2, false, message, claims.parse(), LEVEL.FATAL).Result()
 	BuiltInExit(1)
 }
 
-// Fatalln This is equivalent to calling Println followed by os.Exit(1). The log level is CRITICAL.
+// Fatalln This is equivalent to calling Println followed by os.Exit(1). The log level is FATAL.
 // This method will wait for the write to complete
 func (claims Claims) Fatalln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
-	service.Log(2, false, message, claims.parse(), LEVEL.ERROR).Result()
+	service.Log(2, false, message, claims.parse(), LEVEL.FATAL).Result()
 	BuiltInExit(1)
 }
 

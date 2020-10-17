@@ -142,7 +142,7 @@ func TestError(t *testing.T) {
 }
 
 func TestFatal(t *testing.T) {
-	setUp(t, LEVEL.CRITICAL, false, nil)
+	setUp(t, LEVEL.FATAL, false, nil)
 	// Mock exit
 	BuiltInExit = func(code int) {
 		if code != 1 {

@@ -84,7 +84,7 @@ func TestClaims_Error(t *testing.T) {
 }
 
 func TestClaims_Fatal(t *testing.T) {
-	setUp(t, LEVEL.CRITICAL, false, testClaims.parse())
+	setUp(t, LEVEL.FATAL, false, testClaims.parse())
 	// Mock exit
 	BuiltInExit = func(code int) {
 		if code != 1 {
