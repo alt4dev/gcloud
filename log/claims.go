@@ -115,6 +115,7 @@ func (claims Claims) Errorln(v ...interface{}) *service.LogResult {
 }
 
 // Fatal This is equivalent to calling Print followed by os.Exit(1). The log level is CRITICAL.
+// This method will wait for the write to complete
 func (claims Claims) Fatal(v ...interface{}) {
 	message := fmt.Sprint(v...)
 	service.Log(2, false, message, nil, LEVEL.ERROR).Result()
@@ -122,6 +123,7 @@ func (claims Claims) Fatal(v ...interface{}) {
 }
 
 // Fatalf This is equivalent to calling Printf followed by os.Exit(1). The log level is CRITICAL.
+// This method will wait for the write to complete
 func (claims Claims) Fatalf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
 	service.Log(2, false, message, nil, LEVEL.ERROR).Result()
@@ -129,6 +131,7 @@ func (claims Claims) Fatalf(format string, v ...interface{}) {
 }
 
 // Fatalln This is equivalent to calling Println followed by os.Exit(1). The log level is CRITICAL.
+// This method will wait for the write to complete
 func (claims Claims) Fatalln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
 	service.Log(2, false, message, nil, LEVEL.ERROR).Result()
@@ -136,6 +139,7 @@ func (claims Claims) Fatalln(v ...interface{}) {
 }
 
 // Panic This is equivalent to calling Print followed by panic(). The log level is CRITICAL.
+// This method will wait for the write to complete
 func (claims Claims) Panic(v ...interface{}) {
 	message := fmt.Sprint(v...)
 	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
@@ -143,6 +147,7 @@ func (claims Claims) Panic(v ...interface{}) {
 }
 
 // Panicf This is equivalent to calling Printf followed by panic(). The log level is CRITICAL.
+// This method will wait for the write to complete
 func (claims Claims) Panicf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
 	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
@@ -150,6 +155,7 @@ func (claims Claims) Panicf(format string, v ...interface{}) {
 }
 
 // Panicln This is equivalent to calling Println followed by panic(). The log level is CRITICAL.
+// This method will wait for the write to complete
 func (claims Claims) Panicln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
 	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
