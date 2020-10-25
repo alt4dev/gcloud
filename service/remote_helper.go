@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"github.com/alt4dev/protobuff/proto"
 	"sync"
@@ -40,7 +39,7 @@ func (helper DefaultHelper) WriteLog(msg *proto.Log, result *LogResult) {
 		return
 	}
 	if options.Mode != "testing" {
-		result.R, result.Err = (*client).WriteLog(context.Background(), msg)
+		result.R, result.Err = (*client).WriteLog(options.AuthContext, msg)
 	}
 	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
 	if (result.R != nil && result.R.Status != proto.Result_ACKNOWLEDGED) || shouldEmit || result.Err != nil {

@@ -2,10 +2,12 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/alt4dev/protobuff/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,12 +18,12 @@ var connection *grpc.ClientConn
 var client *proto.LoggingClient
 
 var options = struct {
-	AuthToken string
+	AuthContext context.Context
 	Mode      string
 	Source      string
 	Writer    io.Writer
 }{
-	AuthToken: "",
+	AuthContext: nil,
 	Mode:      "release",
 	Source:      "default",
 	Writer:    os.Stderr,
@@ -82,8 +84,9 @@ func setupOptions() {
 // SetAuthToken Used to set the auth token for writing to alt4.
 // This setting can be done via config file ALT4_CONFIG or setting environment variable ALT4_AUTH_TOKEN
 func SetAuthToken(token string) {
+	md := metadata.Pairs("AuthToken", token)
 	if token != "" {
-		options.AuthToken = token
+		options.AuthContext = metadata.NewOutgoingContext(context.Background(), md)
 	}
 }
 

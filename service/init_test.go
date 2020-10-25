@@ -28,11 +28,6 @@ func TestSetupOptions(t *testing.T) {
 	// Set options and confirm that options were updated accordingly
 	setupOptions()
 
-	if options.AuthToken != content.Token {
-		t.Error("Tokens don't match after options setup")
-		return
-	}
-
 	if options.Mode != content.Mode {
 		t.Error("Modes don't match after options setup")
 		return
@@ -49,10 +44,6 @@ func TestSetupOptions(t *testing.T) {
 	os.Setenv("ALT4_SOURCE", "javascript")
 
 	setupOptions()
-	if options.AuthToken != "A second token" {
-		t.Error("Token not overridden by env")
-		return
-	}
 
 	if options.Mode != "release" {
 		t.Error("Mode not overridden by env")
@@ -61,13 +52,6 @@ func TestSetupOptions(t *testing.T) {
 
 	if options.Source != "javascript" {
 		t.Error("Source not overridden by env")
-		return
-	}
-
-	// Test that setting options from the code overrides options set from env
-	SetAuthToken("Some new auth token")
-	if options.AuthToken != "Some new auth token" {
-		t.Error("Token not overridden")
 		return
 	}
 
