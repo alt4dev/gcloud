@@ -10,7 +10,7 @@ import (
 
 // Log Creates a log entry and writes it to alt4 in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
-func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, level proto.Message_Level) *LogResult {
+func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, level proto.Log_Level) *LogResult {
 	if threadInit {
 		initGroup()
 	}
@@ -18,7 +18,7 @@ func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, 
 	// Get the parent file and function of the caller
 	pc, file, line, _ := runtime.Caller(calldepth)
 	function := runtime.FuncForPC(pc).Name()
-	msg := proto.Message{
+	msg := proto.Log{
 		Source:    options.Source,
 		Thread:    getThreadId(),
 		Message:   message,
@@ -37,12 +37,12 @@ func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, 
 	return &result
 }
 
-func writerHelper(msg *proto.Message, result *LogResult) {
+func writerHelper(msg *proto.Log, result *LogResult) {
 	defer result.wg.Done()
 	Alt4RemoteHelper.WriteLog(msg, result)
 }
 
-func emitLog(msg *proto.Message, err error) {
+func emitLog(msg *proto.Log, err error) {
 	if err != nil {
 		emitError.Println(err)
 	}

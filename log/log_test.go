@@ -9,11 +9,11 @@ import (
 	"testing"
 )
 
-var writerMock func(msg *proto.Message)
+var writerMock func(msg *proto.Log)
 
-type RemoteWriterMock struct{}
+type RemoteMock struct{}
 
-func (w RemoteWriterMock) Write(msg *proto.Message, result *service.LogResult) {
+func (w RemoteWriterMock) Write(msg *proto.Log, result *service.LogResult) {
 	writerMock(msg)
 }
 

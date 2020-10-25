@@ -24,23 +24,23 @@ func (result *LogResult) Result() (*proto.Result, error) {
 // You can implement this function to mock writes to alt4 for better testing of your system.
 type RemoteHelper interface {
 	// WriteLog function will be called with the Message to be sent to alt4 and an empty LogResult to fill once done
-	WriteLog(msg *proto.Message, result *LogResult)
+	WriteLog(msg *proto.Log, result *LogResult)
 	// WriteAudit function will be called with an audit message to be sent to alt4 and an empty LogResult to fill once done.
-	WriteAudit(msg *proto.AuditMessage, result *LogResult)
+	WriteAudit(msg *proto.AuditLog, result *LogResult)
 	// QueryAudit function will be called when you query audit logs. This function is synchronous.
 	QueryAudit(query proto.Query) (result *proto.QueryResult, err error)
 }
 
 type DefaultHelper struct{}
 
-func (helper DefaultHelper) WriteLog(msg *proto.Message, result *LogResult) {
+func (helper DefaultHelper) WriteLog(msg *proto.Log, result *LogResult) {
 	if getClient() == nil {
 		result.Err = errors.New("error connecting to remote server")
 		emitLog(msg, result.Err)
 		return
 	}
 	if options.Mode != "testing" {
-		result.R, result.Err = (*client).Log(context.Background(), msg)
+		result.R, result.Err = (*client).WriteLog(context.Background(), msg)
 	}
 	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
 	if (result.R != nil && result.R.Status != proto.Result_ACKNOWLEDGED) || shouldEmit || result.Err != nil {
@@ -51,7 +51,7 @@ func (helper DefaultHelper) WriteLog(msg *proto.Message, result *LogResult) {
 	}
 }
 
-func (helper DefaultHelper) WriteAudit(msg *proto.AuditMessage, result *LogResult){
+func (helper DefaultHelper) WriteAudit(msg *proto.AuditLog, result *LogResult){
 	// TODO: Implement audit
 }
 
