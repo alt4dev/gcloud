@@ -29,7 +29,7 @@ func (result GroupResult) Close(v ...interface{}) {
 			claims = result.claims.parse()
 		}
 		message := fmt.Sprint(v...)
-		service.Log(2, true, message, claims, proto.Log_NONE)
+		service.Log(2, false, message, claims, proto.Log_NONE)
 	}
 	service.CloseGroup()
 }
