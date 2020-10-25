@@ -31,9 +31,9 @@ type RemoteHelper interface {
 	QueryAudit(query proto.Query) (result *proto.QueryResult, err error)
 }
 
-type helper struct{}
+type DefaultHelper struct{}
 
-func (h helper) WriteLog(msg *proto.Message, result *LogResult) {
+func (helper DefaultHelper) WriteLog(msg *proto.Message, result *LogResult) {
 	if getClient() == nil {
 		result.Err = errors.New("error connecting to remote server")
 		emitLog(msg, result.Err)
@@ -51,11 +51,14 @@ func (h helper) WriteLog(msg *proto.Message, result *LogResult) {
 	}
 }
 
-func (h helper) WriteAudit(msg *proto.AuditMessage, result *LogResult){
+func (helper DefaultHelper) WriteAudit(msg *proto.AuditMessage, result *LogResult){
 	// TODO: Implement audit
 }
 
-func (h helper) QueryAudit(query proto.Query) (result *proto.QueryResult, err error) {
+func (helper DefaultHelper) QueryAudit(query proto.Query) (result *proto.QueryResult, err error) {
 	// TODO: Implement query audit
 	return nil, nil
 }
+
+// Alt4RemoteWriter For testing purposes, implement your own RemoteHelper and equate it to this variable
+var Alt4RemoteHelper RemoteHelper = DefaultHelper{}
