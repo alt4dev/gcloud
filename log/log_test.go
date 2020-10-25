@@ -11,10 +11,15 @@ import (
 
 var writerMock func(msg *proto.Log)
 
-type RemoteMock struct{}
+type RemoteHelperMock struct{}
 
-func (w RemoteWriterMock) Write(msg *proto.Log, result *service.LogResult) {
+func (helper RemoteHelperMock) WriteLog(msg *proto.Log, result *service.LogResult) {
 	writerMock(msg)
+}
+
+func (helper RemoteHelperMock) WriteAudit(msg *proto.AuditLog, result *service.LogResult) {}
+func (helper RemoteHelperMock) QueryAudit(query proto.Query) (result *proto.QueryResult, err error) {
+	return nil, nil
 }
 
 func whereAmI() int {
@@ -26,27 +31,24 @@ var testFile string
 var testMessage string
 var testLine int
 
-func setUp(t *testing.T, level uint8, isGroup bool, claims []*proto.Claim) {
-	service.Alt4RemoteWriter = RemoteWriterMock{}
+func setUp(t *testing.T, level proto.Log_Level, claims []*proto.Claim) {
+	service.Alt4RemoteHelper = RemoteHelperMock{}
 
 	_, testFile, _, _ = runtime.Caller(1)
-	writerMock = func(msg *proto.Message) {
+	writerMock = func(msg *proto.Log) {
 		if msg.Message != testMessage {
 			t.Error("Unexpected testMessage found")
 			t.Log(msg.Message)
 			t.Log(testMessage)
 		}
-		if msg.LineNo != uint32(testLine) {
-			t.Errorf("Unexpected testLine  number found. %d != %d\n", msg.LineNo, testLine)
+		if msg.Line != uint32(testLine) {
+			t.Errorf("Unexpected testLine  number found. %d != %d\n", msg.Line, testLine)
 		}
-		if msg.FileName != testFile {
-			t.Errorf("Unexpected testFile found. '%s' != '%s'", msg.FileName, testFile)
+		if msg.File != testFile {
+			t.Errorf("Unexpected testFile found. '%s' != '%s'", msg.File, testFile)
 		}
-		if msg.Level != uint32(level) {
+		if msg.Level != level {
 			t.Errorf("Unexpected level found. %d != %d\n", msg.Level, level)
-		}
-		if msg.ThreadInit != isGroup {
-			t.Errorf("Expected thread init to be %v but found %v", isGroup, msg.ThreadInit)
 		}
 		if (claims == nil && msg.Claims != nil) || (claims != nil && msg.Claims == nil) {
 			t.Errorf("Claims don't match")
@@ -70,14 +72,14 @@ func setUp(t *testing.T, level uint8, isGroup bool, claims []*proto.Claim) {
 
 
 func TestGroup(t *testing.T) {
-	setUp(t, LEVEL.DEBUG, true, nil)
+	setUp(t, proto.Log_NONE, nil)
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	defer Group("A test print testMessage", "nothing", 10).Close()
 }
 
 func TestPrint(t *testing.T) {
-	setUp(t, LEVEL.DEBUG, false, nil)
+	setUp(t, proto.Log_NONE, nil)
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = Print("A test print testMessage", "nothing", 10).Result()
@@ -90,7 +92,7 @@ func TestPrint(t *testing.T) {
 }
 
 func TestInfo(t *testing.T) {
-	setUp(t, LEVEL.INFO, false, nil)
+	setUp(t, proto.Log_INFO, nil)
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = Info("A test print testMessage", "nothing", 10).Result()
@@ -103,7 +105,7 @@ func TestInfo(t *testing.T) {
 }
 
 func TestDebug(t *testing.T) {
-	setUp(t, LEVEL.DEBUG, false, nil)
+	setUp(t, proto.Log_DEBUG, nil)
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = Debug("A test print testMessage", "nothing", 10).Result()
@@ -116,7 +118,7 @@ func TestDebug(t *testing.T) {
 }
 
 func TestWarning(t *testing.T) {
-	setUp(t, LEVEL.WARNING, false, nil)
+	setUp(t, proto.Log_WARNING, nil)
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = Warning("A test print testMessage", "nothing", 10).Result()
@@ -129,7 +131,7 @@ func TestWarning(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	setUp(t, LEVEL.ERROR, false, nil)
+	setUp(t, proto.Log_ERROR, nil)
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = Error("A test print testMessage", "nothing", 10).Result()
@@ -142,7 +144,7 @@ func TestError(t *testing.T) {
 }
 
 func TestFatal(t *testing.T) {
-	setUp(t, LEVEL.FATAL, false, nil)
+	setUp(t, proto.Log_FATAL, nil)
 	// Mock exit
 	BuiltInExit = func(code int) {
 		if code != 1 {
@@ -161,7 +163,7 @@ func TestFatal(t *testing.T) {
 }
 
 func TestPanic(t *testing.T) {
-	setUp(t, LEVEL.CRITICAL, false, nil)
+	setUp(t, proto.Log_FATAL, nil)
 	// Mock exit
 	BuiltInPanic = func(v interface{}) {
 		if v.(string) != testMessage {

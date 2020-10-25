@@ -13,14 +13,14 @@ var testClaims = Claims{
 }
 
 func TestClaims_Group(t *testing.T) {
-	setUp(t, LEVEL.DEBUG, true, testClaims.parse())
+	setUp(t, proto.Log_NONE, testClaims.parse())
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	defer testClaims.Group("A test print testMessage", "nothing", 10).Close()
 }
 
 func TestClaims_Print(t *testing.T) {
-	setUp(t, LEVEL.DEBUG, false, testClaims.parse())
+	setUp(t, proto.Log_NONE, testClaims.parse())
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = testClaims.Print("A test print testMessage", "nothing", 10).Result()
@@ -33,7 +33,7 @@ func TestClaims_Print(t *testing.T) {
 }
 
 func TestClaims_Info(t *testing.T) {
-	setUp(t, LEVEL.INFO, false, testClaims.parse())
+	setUp(t, proto.Log_INFO, testClaims.parse())
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = testClaims.Info("A test print testMessage", "nothing", 10).Result()
@@ -46,7 +46,7 @@ func TestClaims_Info(t *testing.T) {
 }
 
 func TestClaims_Debug(t *testing.T) {
-	setUp(t, LEVEL.DEBUG, false, testClaims.parse())
+	setUp(t, proto.Log_DEBUG, testClaims.parse())
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = testClaims.Debug("A test print testMessage", "nothing", 10).Result()
@@ -59,7 +59,7 @@ func TestClaims_Debug(t *testing.T) {
 }
 
 func TestClaims_Warning(t *testing.T) {
-	setUp(t, LEVEL.WARNING, false, testClaims.parse())
+	setUp(t, proto.Log_WARNING, testClaims.parse())
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = testClaims.Warning("A test print testMessage", "nothing", 10).Result()
@@ -72,7 +72,7 @@ func TestClaims_Warning(t *testing.T) {
 }
 
 func TestClaims_Error(t *testing.T) {
-	setUp(t, LEVEL.ERROR, false, testClaims.parse())
+	setUp(t, proto.Log_ERROR, testClaims.parse())
 	testMessage = fmt.Sprint("A test print testMessage", "nothing", 10)
 	testLine = whereAmI() + 1
 	_, _ = testClaims.Error("A test print testMessage", "nothing", 10).Result()
@@ -85,7 +85,7 @@ func TestClaims_Error(t *testing.T) {
 }
 
 func TestClaims_Fatal(t *testing.T) {
-	setUp(t, proto.Log_FATAL, false, testClaims.parse())
+	setUp(t, proto.Log_FATAL, testClaims.parse())
 	// Mock exit
 	BuiltInExit = func(code int) {
 		if code != 1 {
@@ -104,7 +104,7 @@ func TestClaims_Fatal(t *testing.T) {
 }
 
 func TestClaims_Panic(t *testing.T) {
-	setUp(t, LEVEL.CRITICAL, false, testClaims.parse())
+	setUp(t, proto.Log_FATAL, testClaims.parse())
 	// Mock exit
 	BuiltInPanic = func(v interface{}) {
 		if v.(string) != testMessage {

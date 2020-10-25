@@ -14,7 +14,7 @@ func TestSetupOptions(t *testing.T) {
 	content := struct {
 		Token string `json:"token"`
 		Mode string `json:"mode"`
-		Sink string `json:"sink"`
+		Source string `json:"source"`
 	}{"some random token from alt4.dev","testing", "api"}
 	contentJson, _ := json.Marshal(content)
 	// Write the file
@@ -38,7 +38,7 @@ func TestSetupOptions(t *testing.T) {
 		return
 	}
 
-	if options.Sink != content.Sink {
+	if options.Source != content.Source {
 		t.Error("Sinks don't match after options setup")
 		return
 	}
@@ -46,7 +46,7 @@ func TestSetupOptions(t *testing.T) {
 	// Test that having individual environment variables set overrides the config file
 	os.Setenv("ALT4_AUTH_TOKEN", "A second token")
 	os.Setenv("ALT4_MODE", "release")
-	os.Setenv("ALT4_SINK", "javascript")
+	os.Setenv("ALT4_SOURCE", "javascript")
 
 	setupOptions()
 	if options.AuthToken != "A second token" {
@@ -59,8 +59,8 @@ func TestSetupOptions(t *testing.T) {
 		return
 	}
 
-	if options.Sink != "javascript" {
-		t.Error("Sink not overridden by env")
+	if options.Source != "javascript" {
+		t.Error("Source not overridden by env")
 		return
 	}
 
@@ -77,8 +77,8 @@ func TestSetupOptions(t *testing.T) {
 		return
 	}
 
-	SetSink("default")
-	if options.Sink != "default" {
+	SetSource("default")
+	if options.Source != "default" {
 		t.Error("Sink not overridden")
 		return
 	}
