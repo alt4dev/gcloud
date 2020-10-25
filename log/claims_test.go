@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"github.com/alt4dev/protobuff/proto"
 	"testing"
 )
 
@@ -84,7 +85,7 @@ func TestClaims_Error(t *testing.T) {
 }
 
 func TestClaims_Fatal(t *testing.T) {
-	setUp(t, LEVEL.FATAL, false, testClaims.parse())
+	setUp(t, proto.Log_FATAL, false, testClaims.parse())
 	// Mock exit
 	BuiltInExit = func(code int) {
 		if code != 1 {

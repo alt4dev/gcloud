@@ -7,10 +7,9 @@ package log
 import (
 	"fmt"
 	"github.com/alt4dev/go/service"
+	"github.com/alt4dev/protobuff/proto"
 	"os"
 )
-
-var LEVEL = service.LEVEL
 
 // BuiltInPanic Internally this function just calls panic(). Override for testing(Panic, Panicf, Panicln)
 var BuiltInPanic func(v interface{}) = func(v interface{}) {
@@ -27,105 +26,106 @@ var BuiltInExit func(code int) = func(code int) {
 func Group(v ...interface{}) *GroupResult {
 	title := fmt.Sprint(v...)
 	return &GroupResult{
-		logResult: service.Log(2, true, title, nil, LEVEL.DEBUG),
+		logResult: service.Log(2, true, title, nil, proto.Log_NONE),
+		claims: nil,
 	}
 }
 
-// Print send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprint(a...)
+// Print send a log message to alt4. The log level is NONE. Log message will be formatted by fmt.Sprint(a...)
 func Print(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, nil, LEVEL.DEBUG)
+	return service.Log(2, false, message, nil, proto.Log_NONE)
 }
 
-// Printf send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintf(a...)
+// Printf send a log message to alt4. The log level is NONE. Log message will be formatted by fmt.Sprintf(a...)
 func Printf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, nil, LEVEL.DEBUG)
+	return service.Log(2, false, message, nil, proto.Log_NONE)
 }
 
-// Println send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
+// Println send a log message to alt4. The log level is NONE. Log message will be formatted by fmt.Sprintln(a...)
 func Println(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, nil, LEVEL.DEBUG)
+	return service.Log(2, false, message, nil, proto.Log_NONE)
 }
 
 // Info send a log message to alt4. The log level is INFO. Log message will be formatted by fmt.Sprint(a...)
 func Info(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, nil, LEVEL.INFO)
+	return service.Log(2, false, message, nil, proto.Log_INFO)
 }
 
 // Infof send a log message to alt4. The log level is INFO. Log message will be formatted by fmt.Sprintf(a...)
 func Infof(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, nil, LEVEL.INFO)
+	return service.Log(2, false, message, nil, proto.Log_INFO)
 }
 
 // Infoln send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
 func Infoln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, nil, LEVEL.INFO)
+	return service.Log(2, false, message, nil, proto.Log_INFO)
 }
 
 // Debug send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprint(a...)
 func Debug(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, nil, LEVEL.DEBUG)
+	return service.Log(2, false, message, nil, proto.Log_DEBUG)
 }
 
 // Debugf send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintf(a...)
 func Debugf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, nil, LEVEL.DEBUG)
+	return service.Log(2, false, message, nil, proto.Log_DEBUG)
 }
 
 // Debugln send a log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
 func Debugln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, nil, LEVEL.DEBUG)
+	return service.Log(2, false, message, nil, proto.Log_DEBUG)
 }
 
 // Warning send a log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprint(a...)
 func Warning(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, nil, LEVEL.WARNING)
+	return service.Log(2, false, message, nil, proto.Log_WARNING)
 }
 
 // Warningf send a log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprintf(a...)
 func Warningf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, nil, LEVEL.WARNING)
+	return service.Log(2, false, message, nil, proto.Log_WARNING)
 }
 
 // Warningln send a log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprintln(a...)
 func Warningln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, nil, LEVEL.WARNING)
+	return service.Log(2, false, message, nil, proto.Log_WARNING)
 }
 
 // Error send a log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprint(a...)
 func Error(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, nil, LEVEL.ERROR)
+	return service.Log(2, false, message, nil, proto.Log_ERROR)
 }
 
 // Errorf send a log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprintf(a...)
 func Errorf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, nil, LEVEL.ERROR)
+	return service.Log(2, false, message, nil, proto.Log_ERROR)
 }
 
 // Errorln send a log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprintln(a...)
 func Errorln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, nil, LEVEL.ERROR)
+	return service.Log(2, false, message, nil, proto.Log_ERROR)
 }
 
 // Fatal This is equivalent to calling Print followed by os.Exit(1). The log level is FATAL.
 // This method will wait for the write to complete
 func Fatal(v ...interface{}) {
 	message := fmt.Sprint(v...)
-	service.Log(2, false, message, nil, LEVEL.FATAL).Result()
+	service.Log(2, false, message, nil, proto.Log_FATAL).Result()
 	BuiltInExit(1)
 }
 
@@ -133,7 +133,7 @@ func Fatal(v ...interface{}) {
 // This method will wait for the write to complete
 func Fatalf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
-	service.Log(2, false, message, nil, LEVEL.FATAL).Result()
+	service.Log(2, false, message, nil, proto.Log_FATAL).Result()
 	BuiltInExit(1)
 }
 
@@ -141,30 +141,30 @@ func Fatalf(format string, v ...interface{}) {
 // This method will wait for the write to complete
 func Fatalln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
-	service.Log(2, false, message, nil, LEVEL.FATAL).Result()
+	service.Log(2, false, message, nil, proto.Log_FATAL).Result()
 	BuiltInExit(1)
 }
 
-// Panic This is equivalent to calling Print followed by panic(). The log level is CRITICAL.
+// Panic This is equivalent to calling Print followed by panic(). The log level is FATAL.
 // This method will wait for the write to complete
 func Panic(v ...interface{}) {
 	message := fmt.Sprint(v...)
-	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
+	service.Log(2, false, message, nil, proto.Log_FATAL).Result()
 	BuiltInPanic(message)
 }
 
-// Panicf This is equivalent to calling Printf followed by panic(). The log level is CRITICAL.
+// Panicf This is equivalent to calling Printf followed by panic(). The log level is FATAL.
 // This method will wait for the write to complete
 func Panicf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
-	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
+	service.Log(2, false, message, nil, proto.Log_FATAL).Result()
 	BuiltInPanic(message)
 }
 
-// Panicln This is equivalent to calling Println followed by panic(). The log level is CRITICAL.
+// Panicln This is equivalent to calling Println followed by panic(). The log level is FATAL.
 // This method will wait for the write to complete
 func Panicln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
-	service.Log(2, false, message, nil, LEVEL.CRITICAL).Result()
+	service.Log(2, false, message, nil, proto.Log_FATAL).Result()
 	BuiltInPanic(message)
 }
