@@ -4,20 +4,36 @@ import (
 	"context"
 	"errors"
 	"github.com/alt4dev/protobuff/proto"
+	"sync"
 )
+
+// LogResult Object returned when you create a log entry.
+type LogResult struct {
+	R   *proto.Result
+	wg *sync.WaitGroup
+	Err error
+}
+
+// Result Returns actual Result from alt4. This will block and wait for the Result if not done
+func (result *LogResult) Result() (*proto.Result, error) {
+	result.wg.Wait()
+	return result.R, result.Err
+}
 
 // RemoteWriter an interface for functions called when writing to alt4.
 // You can implement this function to mock writes to alt4 for better testing of your system.
 type RemoteHelper interface {
-	// WriteLog function will be called with the Message to be sent to alt4 and an empty R to fill once done
+	// WriteLog function will be called with the Message to be sent to alt4 and an empty LogResult to fill once done
 	WriteLog(msg *proto.Message, result *LogResult)
-
+	// WriteAudit function will be called with an audit message to be sent to alt4 and an empty LogResult to fill once done.
 	WriteAudit(msg *proto.AuditMessage, result *LogResult)
+	// QueryAudit function will be called when you query audit logs. This function is synchronous.
+	QueryAudit(query proto.Query) (result *proto.QueryResult, err error)
 }
 
-type writer struct{}
+type helper struct{}
 
-func (w writer) WriteLog(msg *proto.Message, result *LogResult) {
+func (h helper) WriteLog(msg *proto.Message, result *LogResult) {
 	if getClient() == nil {
 		result.Err = errors.New("error connecting to remote server")
 		emitLog(msg, result.Err)
@@ -35,4 +51,11 @@ func (w writer) WriteLog(msg *proto.Message, result *LogResult) {
 	}
 }
 
-func (w writer)
+func (h helper) WriteAudit(msg *proto.AuditMessage, result *LogResult){
+	// TODO: Implement audit
+}
+
+func (h helper) QueryAudit(query proto.Query) (result *proto.QueryResult, err error) {
+	// TODO: Implement query audit
+	return nil, nil
+}
