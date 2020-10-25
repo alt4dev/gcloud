@@ -18,12 +18,12 @@ var client *proto.LoggingClient
 var options = struct {
 	AuthToken string
 	Mode      string
-	Sink      string
+	Source      string
 	Writer    io.Writer
 }{
 	AuthToken: "",
 	Mode:      "release",
-	Sink:      "default",
+	Source:      "default",
 	Writer:    os.Stderr,
 }
 
@@ -62,7 +62,7 @@ func setupOptions() {
 			content := struct {
 				Token     string `json:"token" binding:"required"`
 				Mode      string `json:"mode"`
-				Sink		string `json:"sink"`
+				Source		string `json:"source"`
 			}{}
 			err = json.Unmarshal(jsonContent, &content)
 			if err != nil {
@@ -70,13 +70,13 @@ func setupOptions() {
 			}else {
 				SetAuthToken(content.Token)
 				SetMode(content.Mode)
-				SetSink(content.Sink)
+				SetSource(content.Source)
 			}
 		}
 	}
 	SetAuthToken(os.Getenv("ALT4_AUTH_TOKEN"))
 	SetMode(os.Getenv("ALT4_MODE"))
-	SetSink(os.Getenv("ALT4_SINK"))
+	SetSource(os.Getenv("ALT4_SOURCE"))
 }
 
 // SetAuthToken Used to set the auth token for writing to alt4.
@@ -100,12 +100,11 @@ func SetMode(mode string) {
 	}
 }
 
-// SetSink Sets the sink to write your logs to
-// Sinks can help you distinguish logs from different sources e.g. Languages, services, servers e.t.c.
-// Default sink is `default`
-func SetSink(sink string) {
-	if sink != "" {
-		options.Sink = sink
+// SetSource Sets an id to identify where your logs are coming from
+// By setting the source you distinguish logs from different sources e.g. Languages, services, servers e.t.c.
+func SetSource(source string) {
+	if source != "" {
+		options.Source = source
 	}
 }
 
