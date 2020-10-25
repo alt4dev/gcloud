@@ -76,12 +76,12 @@ func TestGrouping(t *testing.T) {
 		t.Error("Thread ID's should change after initializing an existing group")
 	}
 
-	if _, ok := threads[getRoutineId()]; !ok {
+	if _, ok := threads.Load(getRoutineId()); !ok {
 		t.Error("In an initialized group, routine id should be part of threads list")
 	}
 
 	CloseGroup()
-	if _, ok := threads[getRoutineId()]; ok {
+	if _, ok := threads.Load(getRoutineId()); ok {
 		t.Error("Routine id should be deleted from threads list after closing a thread")
 	}
 }

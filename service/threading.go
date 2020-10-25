@@ -13,12 +13,12 @@ This file has functions that try at best effort to identify the beginning and th
 goroutine and put those logs in the same group
 */
 
-var threads map[string]string
-var waitGroups map[string] *sync.WaitGroup
+var threads sync.Map
+var waitGroups sync.Map
 
 func init()  {
-	threads = map[string]string{}
-	waitGroups = map[string]*sync.WaitGroup{}
+	threads = sync.Map{}
+	waitGroups = sync.Map{}
 }
 
 func getRoutineId() string {
@@ -28,8 +28,8 @@ func getRoutineId() string {
 
 func getThreadId() string {
 	routineId := getRoutineId()
-	if val, ok := threads[routineId]; ok {
-		return val
+	if val, ok := threads.Load(routineId); ok {
+		return val.(string)
 	}
 	// Return a uuid if not grouped
 	return uuid.New().String()
@@ -37,11 +37,10 @@ func getThreadId() string {
 
 func initGroup() {
 	routineId := getRoutineId()
-	if _, ok := threads[routineId]; ok {
+	if _, loaded := threads.LoadAndDelete(routineId); loaded {
 		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(title, claims).Close()`")
-		delete(threads, routineId)
 	}
-	threads[routineId] = getThreadId()
+	threads.Store(routineId, getThreadId())
 }
 
 func CloseGroup() {
@@ -49,20 +48,20 @@ func CloseGroup() {
 	WaitGroup().Wait()
 
 	routineId := getRoutineId()
-	if _, ok := threads[routineId]; ok {
-		delete(threads, routineId)
+	if _, loaded := threads.LoadAndDelete(routineId); loaded {
+		waitGroups.Delete(routineId)
 	}
 }
 
 // Provide wait groups per go routine ID. Closing a group will wait for all write ops to finish.
 func WaitGroup() *sync.WaitGroup {
 	routineId := getRoutineId()
-	wg, ok := waitGroups[routineId]
+	wg, ok := waitGroups.Load(routineId)
 	if ok {
-		return wg
+		return wg.(*sync.WaitGroup)
 	}
 	wg = &sync.WaitGroup{}
-	waitGroups[routineId] = wg
-	return wg
+	waitGroups.Store(routineId, wg)
+	return wg.(*sync.WaitGroup)
 }
 
