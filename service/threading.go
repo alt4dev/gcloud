@@ -37,7 +37,8 @@ func getThreadId() string {
 
 func initGroup() {
 	routineId := getRoutineId()
-	if _, loaded := threads.LoadAndDelete(routineId); loaded {
+	if _, ok := threads.Load(routineId); ok {
+		threads.Delete(routineId)
 		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(title, claims).Close()`")
 	}
 	threads.Store(routineId, getThreadId())
@@ -48,7 +49,8 @@ func CloseGroup() {
 	WaitGroup().Wait()
 
 	routineId := getRoutineId()
-	if _, loaded := threads.LoadAndDelete(routineId); loaded {
+	if _, ok := threads.Load(routineId); ok {
+		threads.Delete(routineId)
 		waitGroups.Delete(routineId)
 	}
 }
