@@ -10,11 +10,10 @@ import (
 
 // Log Creates a log entry and writes it to alt4 in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
-func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, level proto.Log_Level) *LogResult {
+func Log(calldepth int, threadInit bool, message string, claims []*proto.Claim, level proto.Log_Level, logTime time.Time) *LogResult {
 	if threadInit {
 		initGroup()
 	}
-	logTime := time.Now()
 	// Get the parent file and function of the caller
 	pc, file, line, _ := runtime.Caller(calldepth)
 	function := runtime.FuncForPC(pc).Name()

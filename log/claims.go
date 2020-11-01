@@ -16,7 +16,7 @@ type Claims map[string]interface{}
 func (claims Claims) Group(v ...interface{}) *GroupResult {
 	title := fmt.Sprint(v...)
 	return &GroupResult{
-		logResult: service.Log(2, true, title, claims.parse(), proto.Log_NONE),
+		logResult: service.Log(2, true, title, claims.parse(), proto.Log_NONE, time.Now()),
 		claims: &claims,
 	}
 }
@@ -24,98 +24,98 @@ func (claims Claims) Group(v ...interface{}) *GroupResult {
 // Print send claims and the log message to alt4. The log level is NONE. Log message will be formatted by fmt.Sprint(a...)
 func (claims Claims) Print(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_NONE)
+	return service.Log(2, false, message, claims.parse(), proto.Log_NONE, time.Now())
 }
 
 // Printf send claims and the log message to alt4. The log level is NONE. Log message will be formatted by fmt.Sprintf(a...)
 func (claims Claims) Printf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_NONE)
+	return service.Log(2, false, message, claims.parse(), proto.Log_NONE, time.Now())
 }
 
 // Println send claims and the log message to alt4. The log level is NONE. Log message will be formatted by fmt.Sprintln(a...)
 func (claims Claims) Println(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_NONE)
+	return service.Log(2, false, message, claims.parse(), proto.Log_NONE, time.Now())
 }
 
 // Info send claims and the log message to alt4. The log level is INFO. Log message will be formatted by fmt.Sprint(a...)
 func (claims Claims) Info(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_INFO)
+	return service.Log(2, false, message, claims.parse(), proto.Log_INFO, time.Now())
 }
 
 // Infof send claims and the log message to alt4. The log level is INFO. Log message will be formatted by fmt.Sprintf(a...)
 func (claims Claims) Infof(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_INFO)
+	return service.Log(2, false, message, claims.parse(), proto.Log_INFO, time.Now())
 }
 
 // Infoln send claims and the log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
 func (claims Claims) Infoln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_INFO)
+	return service.Log(2, false, message, claims.parse(), proto.Log_INFO, time.Now())
 }
 
 // Debug send claims and the log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprint(a...)
 func (claims Claims) Debug(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_DEBUG)
+	return service.Log(2, false, message, claims.parse(), proto.Log_DEBUG, time.Now())
 }
 
 // Debugf send claims and the log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintf(a...)
 func (claims Claims) Debugf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_DEBUG)
+	return service.Log(2, false, message, claims.parse(), proto.Log_DEBUG, time.Now())
 }
 
 // Debugln send claims and the log message to alt4. The log level is DEBUG. Log message will be formatted by fmt.Sprintln(a...)
 func (claims Claims) Debugln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_DEBUG)
+	return service.Log(2, false, message, claims.parse(), proto.Log_DEBUG, time.Now())
 }
 
 // Warning send claims and the log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprint(a...)
 func (claims Claims) Warning(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_WARNING)
+	return service.Log(2, false, message, claims.parse(), proto.Log_WARNING, time.Now())
 }
 
 // Warningf send claims and the log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprintf(a...)
 func (claims Claims) Warningf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_WARNING)
+	return service.Log(2, false, message, claims.parse(), proto.Log_WARNING, time.Now())
 }
 
 // Warningln send claims and the log message to alt4. The log level is WARNING. Log message will be formatted by fmt.Sprintln(a...)
 func (claims Claims) Warningln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_WARNING)
+	return service.Log(2, false, message, claims.parse(), proto.Log_WARNING, time.Now())
 }
 
 // Error send claims and the log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprint(a...)
 func (claims Claims) Error(v ...interface{}) *service.LogResult {
 	message := fmt.Sprint(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_ERROR)
+	return service.Log(2, false, message, claims.parse(), proto.Log_ERROR, time.Now())
 }
 
 // Errorf send claims and the log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprintf(a...)
 func (claims Claims) Errorf(format string, v ...interface{}) *service.LogResult {
 	message := fmt.Sprintf(format, v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_ERROR)
+	return service.Log(2, false, message, claims.parse(), proto.Log_ERROR, time.Now())
 }
 
 // Errorln send claims and the log message to alt4. The log level is ERROR. Log message will be formatted by fmt.Sprintln(a...)
 func (claims Claims) Errorln(v ...interface{}) *service.LogResult {
 	message := fmt.Sprintln(v...)
-	return service.Log(2, false, message, claims.parse(), proto.Log_ERROR)
+	return service.Log(2, false, message, claims.parse(), proto.Log_ERROR, time.Now())
 }
 
 // Fatal This is equivalent to calling Print followed by os.Exit(1). The log level is FATAL.
 // This method will wait for the write to complete
 func (claims Claims) Fatal(v ...interface{}) {
 	message := fmt.Sprint(v...)
-	service.Log(2, false, message, claims.parse(), proto.Log_FATAL).Result()
+	service.Log(2, false, message, claims.parse(), proto.Log_FATAL, time.Now()).Result()
 	BuiltInExit(1)
 }
 
@@ -123,7 +123,7 @@ func (claims Claims) Fatal(v ...interface{}) {
 // This method will wait for the write to complete
 func (claims Claims) Fatalf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
-	service.Log(2, false, message, claims.parse(), proto.Log_FATAL).Result()
+	service.Log(2, false, message, claims.parse(), proto.Log_FATAL, time.Now()).Result()
 	BuiltInExit(1)
 }
 
@@ -131,7 +131,7 @@ func (claims Claims) Fatalf(format string, v ...interface{}) {
 // This method will wait for the write to complete
 func (claims Claims) Fatalln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
-	service.Log(2, false, message, claims.parse(), proto.Log_FATAL).Result()
+	service.Log(2, false, message, claims.parse(), proto.Log_FATAL, time.Now()).Result()
 	BuiltInExit(1)
 }
 
@@ -139,7 +139,7 @@ func (claims Claims) Fatalln(v ...interface{}) {
 // This method will wait for the write to complete
 func (claims Claims) Panic(v ...interface{}) {
 	message := fmt.Sprint(v...)
-	service.Log(2, false, message, claims.parse(), proto.Log_FATAL).Result()
+	service.Log(2, false, message, claims.parse(), proto.Log_FATAL, time.Now()).Result()
 	BuiltInPanic(message)
 }
 
@@ -147,7 +147,7 @@ func (claims Claims) Panic(v ...interface{}) {
 // This method will wait for the write to complete
 func (claims Claims) Panicf(format string, v ...interface{}) {
 	message := fmt.Sprintf(format, v...)
-	service.Log(2, false, message, claims.parse(), proto.Log_FATAL).Result()
+	service.Log(2, false, message, claims.parse(), proto.Log_FATAL, time.Now()).Result()
 	BuiltInPanic(message)
 }
 
@@ -155,7 +155,7 @@ func (claims Claims) Panicf(format string, v ...interface{}) {
 // This method will wait for the write to complete
 func (claims Claims) Panicln(v ...interface{}) {
 	message := fmt.Sprintln(v...)
-	service.Log(2, false, message, claims.parse(), proto.Log_FATAL).Result()
+	service.Log(2, false, message, claims.parse(), proto.Log_FATAL, time.Now()).Result()
 	BuiltInPanic(message)
 }
 

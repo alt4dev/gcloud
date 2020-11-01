@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
+	"time"
 )
 
 // GroupResult Object returned by creating a new log group/thread.
@@ -29,7 +30,7 @@ func (result GroupResult) Close(v ...interface{}) {
 			claims = result.claims.parse()
 		}
 		message := fmt.Sprint(v...)
-		service.Log(2, false, message, claims, proto.Log_NONE)
+		service.Log(2, false, message, claims, proto.Log_NONE, time.Now())
 	}
 	service.CloseGroup()
 }
