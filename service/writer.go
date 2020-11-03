@@ -5,16 +5,18 @@ import "time"
 type alt4Writer struct{}
 
 func (writer alt4Writer) Write(p []byte) (n int, err error) {
+	t := time.Now()
 	message := string(p)
-	Log(5, false, message, nil, 1, time.Now())
+	Log(5, false, message, nil, 1, t)
 	return len(p), nil
 }
 
 type alt4SyncWriter struct{}
 
 func (writer alt4SyncWriter) Write(p []byte) (n int, err error) {
+	t := time.Now()
 	message := string(p)
-	_, _err := Log(5, false, message, nil, 1, time.Now()).Result()
+	_, _err := Log(5, false, message, nil, 1, t).Result()
 	return len(p), _err
 }
 

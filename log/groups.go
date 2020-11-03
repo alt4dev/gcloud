@@ -24,13 +24,14 @@ func (result GroupResult) Result() (*proto.Result, error) {
 // If there were unfinished writes to alt4 during this thread.
 // This method will wait for the writes to finish
 func (result GroupResult) Close(v ...interface{}) {
+	t := time.Now()
 	if len(v) > 0{
 		var claims []*proto.Claim = nil
 		if result.claims != nil {
 			claims = result.claims.parse()
 		}
 		message := fmt.Sprint(v...)
-		service.Log(2, false, message, claims, proto.Log_NONE, time.Now())
+		service.Log(2, false, message, claims, proto.Log_NONE, t)
 	}
 	service.CloseGroup()
 }
