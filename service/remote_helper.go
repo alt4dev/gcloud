@@ -38,10 +38,10 @@ func (helper DefaultHelper) WriteLog(msg *proto.Log, result *LogResult) {
 		emitLog(msg, result.Err)
 		return
 	}
-	if options.Mode != "testing" {
+	if options.Mode != ModeTesting && options.Mode != ModeSilent {
 		result.R, result.Err = (*client).WriteLog(options.AuthContext, msg)
 	}
-	shouldEmit := options.Mode == "debug" || options.Mode == "testing"
+	shouldEmit := options.Mode == ModeDebug || options.Mode == ModeTesting
 	if (result.R != nil && result.R.Status != proto.Result_ACKNOWLEDGED) || shouldEmit || result.Err != nil {
 		if result.R != nil && result.R.Status != proto.Result_ACKNOWLEDGED {
 			result.Err = errors.New(result.R.Message)

@@ -90,15 +90,21 @@ func SetAuthToken(token string) {
 	}
 }
 
+const ModeRelease = "release"
+const ModeDebug = "debug"
+const ModeTesting = "testing"
+const ModeSilent = "silent"
+
 // SetMode Sets the behaviour of alt4 based on the following:
 // `release` - Under this mode logs are written to alt4 and not emitted to stdout
 // `debug` - Under this mode logs are written to alt4 and emitted to stdout
 // `testing` - Under this mode logs are not written to alt4, just emitted to stdout
+// `silent` - Under this mode logs are not written to alt4 or emitted to stdout
 // `json`(coming soon) - Under this mode all logs are written to a JSON file which you can later upload to alt4
 // Mode can also be set via a config file ALT4_CONFIG or setting environment variable ALT4_MODE
 // Default mode is `release`
 func SetMode(mode string) {
-	if mode == "release" || mode == "debug" || mode == "testing" {
+	if mode == ModeRelease || mode == ModeDebug || mode == ModeTesting || mode == ModeSilent {
 		options.Mode = mode
 	}
 }

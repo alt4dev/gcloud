@@ -21,6 +21,7 @@ Alt4 automatically reads config information from the environment. Auth tokens ca
         unless there's a connection/authentication error.
         - `debug` Under this mode logs will be sent to alt4 and written to `stderr`.
         - `testing` Under this mode logs will only be emitted to `stderr` and not sent to alt4. We use this mode to develop our products locally.
+        - `silent` Similar to testing but the logs won't be not emitted to `stdoud`.
         - `json`(coming soon) - Under this mode, logs will be written to a JSON file which can later be uploaded to alt4
     - `ALT4_SINK` A string specifying a sink to log the logs under. By default, logs entries will be logged to the sink `default`.
 3. **Set options from the code**
