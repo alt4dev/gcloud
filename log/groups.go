@@ -23,15 +23,21 @@ func (result GroupResult) Result() (*proto.Result, error) {
 // This can be useful for determining the latency of a request.
 // If there were unfinished writes to alt4 during this thread.
 // This method will wait for the writes to finish
+// Close also logs any panic but doesn't recover.
 func (result GroupResult) Close(v ...interface{}) {
+	defer service.CloseGroup()
 	t := time.Now()
+	var claims []*proto.Claim = nil
+	if result.claims != nil {
+		claims = result.claims.parse()
+	}
+	// Recover any panic, just to log it and continue panakin.
+	if r := recover(); r != nil {
+		service.Log(2, false, fmt.Sprint(r), claims, proto.Log_FATAL, t)
+		panic(r)
+	}
 	if len(v) > 0{
-		var claims []*proto.Claim = nil
-		if result.claims != nil {
-			claims = result.claims.parse()
-		}
 		message := fmt.Sprint(v...)
 		service.Log(2, false, message, claims, proto.Log_NONE, t)
 	}
-	service.CloseGroup()
 }
