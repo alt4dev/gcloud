@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
+	"runtime/debug"
 	"time"
 )
 
@@ -34,6 +35,8 @@ func (result GroupResult) Close(v ...interface{}) {
 	// Recover any panic, just to log it and continue panakin.
 	if r := recover(); r != nil {
 		service.Log(2, false, fmt.Sprint(r), claims, proto.Log_FATAL, t)
+		// Log stack trace
+		service.Log(2, false, fmt.Sprint(string(debug.Stack())), claims, proto.Log_ERROR, time.Now())
 		panic(r)
 	}
 	if len(v) > 0{
