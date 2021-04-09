@@ -5,7 +5,6 @@ import (
 	"github.com/alt4dev/go/service"
 	"github.com/alt4dev/protobuff/proto"
 	"runtime/debug"
-	"time"
 )
 
 // GroupResult Object returned by creating a new log group/thread.
@@ -27,20 +26,19 @@ func (result GroupResult) Result() (*proto.Result, error) {
 // Close also logs any panic but doesn't recover.
 func (result GroupResult) Close(v ...interface{}) {
 	defer service.CloseGroup()
-	t := time.Now()
 	var claims []*proto.Claim = nil
 	if result.claims != nil {
 		claims = result.claims.parse()
 	}
-	// Recover any panic, just to log it and continue panakin.
+	// Recover any panic, just to losg it and continue panakin.
 	if r := recover(); r != nil {
-		service.Log(2, false, fmt.Sprint(r), claims, proto.Log_FATAL, t)
+		service.Log(2, false, fmt.Sprint(r), claims, proto.Log_FATAL, service.LogTime())
 		// Log stack trace
-		service.Log(2, false, fmt.Sprint(string(debug.Stack())), claims, proto.Log_ERROR, time.Now())
+		service.Log(2, false, fmt.Sprint(string(debug.Stack())), claims, proto.Log_ERROR, service.LogTime())
 		panic(r)
 	}
 	if len(v) > 0{
 		message := fmt.Sprint(v...)
-		service.Log(2, false, message, claims, proto.Log_NONE, t)
+		service.Log(2, false, message, claims, proto.Log_NONE, service.LogTime())
 	}
 }

@@ -11,6 +11,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"sync"
+	"time"
 )
 
 var address = "rpc.alt4.dev:443"
@@ -121,4 +123,12 @@ func SetSource(source string) {
 // Defaults os.Stderr
 func SetDebugOutput(w io.Writer){
 	options.Writer = w
+}
+
+var timeLock sync.Mutex
+
+func LogTime() time.Time {
+	timeLock.Lock()
+	defer timeLock.Unlock()
+	return time.Now()
 }
