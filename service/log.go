@@ -32,8 +32,14 @@ func Log(calldepth int, asGroup bool, message string, claims []*proto.Claim, lev
 	result := LogResult{
 		wg: WaitGroup(),
 	}
-	WaitGroup().Add(1)
-	go writerHelper(&msg, &result)
+	if options.Mode == ModeDebug || options.Mode == ModeTesting {
+		// Write to stderr if conditions are met.
+		emitLog(&msg)
+	}
+	if options.Mode != ModeTesting && options.Mode != ModeSilent {
+		WaitGroup().Add(1)
+		go writerHelper(&msg, &result)
+	}
 	return &result
 }
 
@@ -42,10 +48,7 @@ func writerHelper(msg *proto.Log, result *LogResult) {
 	Alt4RemoteHelper.WriteLog(msg, result)
 }
 
-func emitLog(msg *proto.Log, err error) {
-	if err != nil {
-		emitError.Println(err)
-	}
+func emitLog(msg *proto.Log) {
 	timeString := time.Unix(0, int64(msg.Timestamp)).Format("2006-01-02T15:04:05.000Z")
 	message := fmt.Sprintf("[alt4 %s] %s %s:%d %s", msg.Level.String(), timeString, msg.File, msg.Line, msg.Message)
 	lines := []string{message}
@@ -54,3 +57,4 @@ func emitLog(msg *proto.Log, err error) {
 	}
 	emit.Println(strings.Join(lines, "\n"))
 }
+
