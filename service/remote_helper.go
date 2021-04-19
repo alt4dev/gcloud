@@ -45,6 +45,7 @@ func (helper DefaultHelper) WriteLog(msg *proto.Log, result *LogResult) {
 		if result.R != nil && result.R.Status != proto.Result_ACKNOWLEDGED {
 			result.Err = errors.New(result.R.Message)
 		}
+		emitError.Println(result.R.Status.String())
 		emitError.Println(result.Err)
 	}
 }
