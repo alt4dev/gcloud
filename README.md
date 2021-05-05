@@ -138,3 +138,47 @@ func main() {
     logger.Println("This writes synchronously to alt4")
 }
 ```
+
+### Query Language
+Alt4 uses a query language that will look familiar to anyone using a terminal a lot.
+#### Free form search phrases
+```
+"my search phrase" "a second search phrase"
+```
+A free form search phrase will be searched on the following fields:
+`Message`, `Function`, `Filename/path`, `Source` and `Claims(as a json string)`
+
+#### Searching By Claims
+```shell
+"Free form message" --my_claim="Claim Value" --other_claim="Other Value"
+```
+Searching by claims also supports multiple value search for equal and not equal:
+```shell
+--my_claim="Value 1" "Value 2" "Value 3"
+```
+These values will be searched under an OR condition i.e 
+`my_claim=="Value 1" OR my_claim=="Value 2" OR my_claim=="Value 3"`
+
+#### Searching by log fields
+When searching log fields, the following fields can be queried directly:
+- `message` The log message provided
+- `claims`(as a json string) The claims provided, then stored as a json object
+- `file` The file the log came from
+- `line` The line the log came from in the file
+- `function` The function that the log came from
+- `level` int log level as per this array `[Default, Info, Debug, Warning, Error, Fatal]`
+- `source` If you've set a custom log source this can help filter different sources.
+
+Searching by these fields is the same as searching by claims but requires the prefix `alt.` to mark them as internal fields.
+Example:
+```shell
+--alt.source="public-api"
+```
+
+#### Search Operators
+These search operators can be used when searching claims or searching log fields.
+- **Equal** `=` or `==`: Supports multiple values per field. This operator cannot be used with `NotEqual` or `Regex` operator on the same field.
+- **Not Equal** `!=`: Supports multiple values per field. This operator cannot be used with `Equal` or `Regex` operator on the same field.
+- **Regex** `~=`: Useful when doing advanced filtering on a field and doesn't support multiple values. This operator cannot be used with `Equal` or `NotEqual` operator on the same field.
+- **GreaterThan and GreaterThanOrEqual** `>` and `>=`: Self explanatory. These operators cannot be used together on the same field.
+- **LessThan and LessThanOrEqual** `<` and `<=`: Self explanatory. These operators cannot be used together on the same field.
