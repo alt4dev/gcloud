@@ -1,10 +1,13 @@
 package service
 
 import (
+	"cloud.google.com/go/logging"
+	"fmt"
 	"github.com/google/uuid"
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 )
 
 /*
@@ -14,11 +17,16 @@ goroutine and put those logs in the same group
 */
 
 var threads sync.Map
-var waitGroups sync.Map
 
-func init()  {
+func init() {
 	threads = sync.Map{}
-	waitGroups = sync.Map{}
+}
+
+type threadDetails struct {
+	id     string
+	start  time.Time
+	parent *logging.Logger
+	child  *logging.Logger
 }
 
 func getRoutineId() string {
@@ -31,39 +39,43 @@ func getThreadId() string {
 	if val, ok := threads.Load(routineId); ok {
 		return val.(string)
 	}
-	// Return a uuid if not grouped
+	// Return a new uuid if not grouped
 	return uuid.New().String()
 }
 
 func initGroup() {
 	routineId := getRoutineId()
-	if _, ok := threads.Load(routineId); ok {
+	if detailsInterface, ok := threads.Load(routineId); ok {
+		details := detailsInterface.(*threadDetails)
+		_ = details.child.Flush()
+		_ = details.parent.Flush()
 		threads.Delete(routineId)
 		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(title, claims).Close()`")
 	}
-	threads.Store(routineId, getThreadId())
+	threadId := getThreadId()
+	threads.Store(routineId, &threadDetails{
+		id:     threadId,
+		start:  LogTime(),
+		parent: client.Logger(fmt.Sprintf("parent-%s", threadId)),
+		child:  client.Logger(threadId),
+	})
+}
+
+func getThreadDetails() *threadDetails {
+	routineId := getRoutineId()
+	if detailsInterface, ok := threads.Load(routineId); ok {
+		return detailsInterface.(*threadDetails)
+	}
+	return nil
 }
 
 func CloseGroup() {
-	// Before closing a group. Wait for all logs to finish writing.
-	WaitGroup().Wait()
-
 	routineId := getRoutineId()
-	if _, ok := threads.Load(routineId); ok {
+	if detailsInterface, ok := threads.Load(routineId); ok {
+		details := detailsInterface.(*threadDetails)
+		// Before closing a group. Wait for all logs to finish writing.
+		_ = details.child.Flush()
+		_ = details.parent.Flush()
 		threads.Delete(routineId)
-		waitGroups.Delete(routineId)
 	}
 }
-
-// Provide wait groups per go routine ID. Closing a group will wait for all write ops to finish.
-func WaitGroup() *sync.WaitGroup {
-	routineId := getRoutineId()
-	wg, ok := waitGroups.Load(routineId)
-	if ok {
-		return wg.(*sync.WaitGroup)
-	}
-	wg = &sync.WaitGroup{}
-	waitGroups.Store(routineId, wg)
-	return wg.(*sync.WaitGroup)
-}
-
