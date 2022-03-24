@@ -4,6 +4,7 @@ package service
 import (
 	"cloud.google.com/go/logging"
 	"context"
+	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"io"
 	"os"
 	"sync"
@@ -11,18 +12,22 @@ import (
 )
 
 var options = struct {
-	Mode   string
-	Writer io.Writer
+	Mode     string
+	Writer   io.Writer
+	Resource *monitoredres.MonitoredResource
 }{
-	Mode:   "release",
-	Writer: os.Stderr,
+	Mode:     "release",
+	Writer:   os.Stderr,
+	Resource: nil,
 }
 
 var client *logging.Client
 
 func init() {
 	SetMode(os.Getenv("ALT4_MODE"))
+}
 
+func setupClient() {
 	// Don't create a client during testing or silent Modes
 	if options.Mode == ModeTesting || options.Mode == ModeSilent {
 		return
@@ -41,10 +46,6 @@ func init() {
 	}
 }
 
-func setupOptions() {
-
-}
-
 const ModeRelease = "release"
 const ModeDebug = "debug"
 const ModeTesting = "testing"
@@ -61,12 +62,25 @@ func SetMode(mode string) {
 	if mode == ModeRelease || mode == ModeDebug || mode == ModeTesting || mode == ModeSilent {
 		options.Mode = mode
 	}
+
+	// Set up the client after setting the mode
+	setupClient()
 }
 
 // SetDebugOutput Is used to specify where alt4 emits additional output e.g. when facing network errors.
 // Defaults os.Stderr
 func SetDebugOutput(w io.Writer) {
 	options.Writer = w
+}
+
+// SetMonitoredResource sets the monitored resource that is the source of log entries
+// This accepts the type e.g. "gae_app", "cloud_run_revision" and labels which are simply a map of the resource labels
+// The easiest way to get these values is to check a previous log entry printed by the same resource to CGP logging
+func SetMonitoredResource(resourceType string, labels map[string]string) {
+	options.Resource = &monitoredres.MonitoredResource{
+		Type:   resourceType,
+		Labels: labels,
+	}
 }
 
 var timeLock sync.Mutex

@@ -41,10 +41,10 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 		Timestamp:   logTime,
 		Severity:    level,
 		Payload:     message,
-		Labels:      nil,
+		Labels:      labels,
 		InsertID:    uuid.New().String(),
 		HTTPRequest: request,
-		Resource:    nil,
+		Resource:    options.Resource,
 		SourceLocation: &logging2.LogEntrySourceLocation{
 			File:     file,
 			Line:     int64(line),

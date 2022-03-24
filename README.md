@@ -10,16 +10,17 @@ This library bridges that gap and provides a familiar API allowing you to easily
 
 ## Google Cloud Logging Client, [Docs](https://pkg.go.dev/mod/github.com/alt4dev/gcloud)
 
-
 ### Install
 ```shell script
 go get github.com/alt4dev/gcloud
 ```
 
-#### Authentication and Config
+### Configuration
+#### Authentication
 To authenticate with gcloud see: [https://cloud.google.com/logging/docs/reference/libraries#setting_up_authentication](https://cloud.google.com/logging/docs/reference/libraries#setting_up_authentication).
 An environment variable `PROJECT_ID` is required to set up the logging client.
 
+#### Mode
 Different modes are applicable:
 - `release`: This is the default mode and, it sends logs to Google cloud logging without emitting them to `stderr`
 - `debug`: This mode sends logs to Google cloud logging and emits them to `stderr`
@@ -34,6 +35,46 @@ import (
 )
 
 alt4Service.SetMode("release")
+```
+
+#### Monitored Resource
+Set the monitored resource that the logs will be produced from. Below is an example of a monitored resource for a Google cloud run service.
+```json
+{
+    "labels": {
+        "configuration_name": "test",
+        "location": "us-central1",
+        "project_id": "alt4dev",
+        "revision_name": "test-april-fools",
+        "service_name": "test-service"
+    },
+    "type": "cloud_run_revision"
+}
+```
+
+This library provides a function `service.SetMonitoredResource` to set a monitored resource for your service.
+The easiest way to get these values is to check a previous log entry printed by the same resource to CGP logging.
+
+Below is how you'd set the monitored resource for the above example:
+```go
+package main
+
+import (
+	"os"
+	alt4Service "github.com/alt4dev/gcloud/service"
+)
+
+func init() {
+	// The variables K_SERVICE, K_REVISION, K_CONFIGURATION are automatically added to a running Cloud run container
+	alt4Service.SetMonitoredResource("cloud_run_revision", map[string]string{
+		"configuration_name": os.Getenv("K_CONFIGURATION"),
+		"location": "us-central1",
+		"project_id": os.Getenv("PROJECT_ID"),
+		"revision_name": os.Getenv("K_REVISION"),
+		"service_name": os.Getenv("K_SERVICE"),
+    })   
+}
+
 ```
 
 
