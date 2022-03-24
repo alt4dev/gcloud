@@ -1,7 +1,5 @@
-// Package log provides methods for writing logs to Alt4
-// Methods in this package write logs asynchronously unless otherwise specified.
-// You can call the function `Result` after log which will block if the operation is not done.
-// The advised behaviour is to group your logs and defer the Close method which will wait for all operations to finish
+// Package log provides methods for writing logs to Google cloud logging
+// The biggest edge this library brings is grouping logs, it's advisable to take advantage of this behaviour
 package log
 
 import (

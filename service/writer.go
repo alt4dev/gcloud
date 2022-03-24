@@ -14,7 +14,7 @@ func (writer alt4Writer) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-// Writer can be used to override a normal/default go logger to write it's output to alt4
+// Writer can be used to override a normal/default go logger to write it's output to Google cloud logging
 // This writer still respects log grouping if you're grouping your request logs
 // Example log.SetOutput(Writer) for the default log package
 var Writer = alt4Writer{}

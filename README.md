@@ -1,7 +1,15 @@
 <a href="https://alt4.dev"><img src="https://alt4.dev/banner.svg" alt="" height="120"></a>
 
+# Advanced Logging and Tracking 4 Developers
+We stand by the principle of making developers' work easier, being able to debug your application easily is one of those requirements.
 
-## Golang Logging Client, [Docs](https://pkg.go.dev/mod/github.com/alt4dev/gcloud)
+If you write logs through Google Cloud AppEngine python then you get your log requests automatically grouped for you per request by Google.
+This functionality is not available on modern container based servers even the ones running on GCP. If you need the functionality you have to implement it yourself.
+
+This library bridges that gap and provides a familiar API allowing you to easily group your logs.
+
+## Google Cloud Logging Client, [Docs](https://pkg.go.dev/mod/github.com/alt4dev/gcloud)
+
 
 ### Install
 ```shell script

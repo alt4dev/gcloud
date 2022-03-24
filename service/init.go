@@ -1,4 +1,4 @@
-// Package service holds the methods necessary to support implementation of loggers that write to alt4.
+// Package service holds the methods necessary to support implementation of loggers that write to Google cloud service
 package service
 
 import (

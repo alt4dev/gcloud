@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Log Creates a log entry and writes it to alt4 in the background.
+// Log Creates a log entry and writes it to Google cloud logging in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
 func Log(callDepth int, message string, request *logging.HTTPRequest, labels map[string]string, level logging.Severity, logTime time.Time) {
 	// Get the parent file and function of the caller
