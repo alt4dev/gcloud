@@ -1,21 +1,23 @@
 package log
 
 import (
+	"cloud.google.com/go/logging"
 	"fmt"
-	"github.com/alt4dev/go/service"
-	"github.com/alt4dev/protobuff/proto"
+	"github.com/alt4dev/gcloud/service"
+	"net/http"
+	"net/url"
 	"runtime/debug"
+	"time"
 )
 
 // GroupResult Object returned by creating a new log group/thread.
 type GroupResult struct {
-	logResult *service.LogResult
-	claims *Claims
-}
-
-// Return the result of the actual log event
-func (result GroupResult) Result() (*proto.Result, error) {
-	return result.logResult.Result()
+	labels    *Labels
+	startTime time.Time
+	status    int
+	method    string
+	url       string
+	request   *http.Request
 }
 
 // Close will mark the end of a thread closing the log group.
@@ -24,21 +26,55 @@ func (result GroupResult) Result() (*proto.Result, error) {
 // If there were unfinished writes to alt4 during this thread.
 // This method will wait for the writes to finish
 // Close also logs any panic but doesn't recover.
-func (result GroupResult) Close(v ...interface{}) {
+func (result *GroupResult) Close() {
 	defer service.CloseGroup()
-	var claims []*proto.Claim = nil
-	if result.claims != nil {
-		claims = result.claims.parse()
+	var labels map[string]string = nil
+	if result.labels != nil {
+		labels = result.labels.parse()
 	}
-	// Recover any panic, just to losg it and continue panakin.
-	if r := recover(); r != nil {
-		service.Log(2, false, fmt.Sprint(r), claims, proto.Log_FATAL, service.LogTime())
+
+	r := recover()
+	// Recover any panic, just to log
+	if r != nil {
+		service.Log(2, fmt.Sprint(r), nil, labels, logging.Critical, service.LogTime())
 		// Log stack trace
-		service.Log(2, false, fmt.Sprint(string(debug.Stack())), claims, proto.Log_ERROR, service.LogTime())
+		service.Log(2, fmt.Sprint(string(debug.Stack())), nil, labels, logging.Critical, service.LogTime())
+	}
+
+	// Parent log should have the last timestamp in the group
+	logTime := service.LogTime()
+
+	latency := logTime.Sub(result.startTime)
+
+	httpRequest := result.request
+	if httpRequest == nil {
+		_url, _ := url.Parse(result.url)
+		httpRequest = &http.Request{
+			Method: result.method,
+			URL:    _url,
+		}
+	}
+
+	// Complete the request
+	request := &logging.HTTPRequest{
+		Request: httpRequest,
+		Status:  result.status,
+		Latency: latency,
+	}
+
+	message := fmt.Sprintf("[%s] %s", result.method, result.url)
+
+	service.Log(2, message, request, labels, logging.Default, logTime)
+	// Anakin, continue panakin
+	if r != nil {
 		panic(r)
 	}
-	if len(v) > 0{
-		message := fmt.Sprint(v...)
-		service.Log(2, false, message, claims, proto.Log_NONE, service.LogTime())
-	}
+}
+
+func (result *GroupResult) SetStatus(httpStatus int) {
+	result.status = httpStatus
+}
+
+func (result *GroupResult) SetRequest(request *http.Request) {
+	result.request = request
 }

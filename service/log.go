@@ -12,12 +12,7 @@ import (
 
 // Log Creates a log entry and writes it to alt4 in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
-func Log(callDepth int, asGroup bool, message string, request *logging.HTTPRequest, labels map[string]string, level logging.Severity, logTime time.Time) {
-	// Don't use resources grouping for testing modes
-	if asGroup && (options.Mode != ModeTesting && options.Mode != ModeSilent) {
-		initGroup()
-	}
-
+func Log(callDepth int, message string, request *logging.HTTPRequest, labels map[string]string, level logging.Severity, logTime time.Time) {
 	// Get the parent file and function of the caller
 	pc, file, line, _ := runtime.Caller(callDepth)
 	function := runtime.FuncForPC(pc).Name()

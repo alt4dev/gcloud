@@ -43,14 +43,14 @@ func getThreadId() string {
 	return uuid.New().String()
 }
 
-func initGroup() {
+func InitGroup() {
 	routineId := getRoutineId()
 	if detailsInterface, ok := threads.Load(routineId); ok {
 		details := detailsInterface.(*threadDetails)
 		_ = details.child.Flush()
 		_ = details.parent.Flush()
 		threads.Delete(routineId)
-		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(title, claims).Close()`")
+		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(url, method).Close()`")
 	}
 	threadId := getThreadId()
 	threads.Store(routineId, &threadDetails{
