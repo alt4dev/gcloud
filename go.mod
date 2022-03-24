@@ -1,10 +1,10 @@
-module github.com/alt4dev/go
+module github.com/alt4dev/gcloud
 
 go 1.14
 
 require (
-	github.com/alt4dev/protobuff v1.0.7
-	github.com/google/go-cmp v0.5.1 // indirect
-	github.com/google/uuid v1.1.1
-	google.golang.org/grpc v1.32.0
+	cloud.google.com/go/logging v1.4.2
+	github.com/google/uuid v1.1.2
+	google.golang.org/genproto v0.0.0-20210517163617-5e0236093d7a
+	google.golang.org/grpc v1.45.0 // indirect
 )
