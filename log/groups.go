@@ -71,10 +71,12 @@ func (result *GroupResult) Close() {
 	}
 }
 
-func (result *GroupResult) SetStatus(httpStatus int) {
+func (result *GroupResult) SetStatus(httpStatus int) *GroupResult {
 	result.status = httpStatus
+	return result
 }
 
-func (result *GroupResult) SetRequest(request *http.Request) {
+func (result *GroupResult) SetRequest(request *http.Request) *GroupResult {
 	result.request = request
+	return result
 }
