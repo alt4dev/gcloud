@@ -10,7 +10,7 @@ func (writer alt4Writer) Write(p []byte) (n int, err error) {
 	t := LogTime()
 	message := string(p)
 
-	Log(5, false, message, nil, nil, logging.Default, t)
+	Log(5, message, nil, nil, logging.Default, t)
 	return len(p), nil
 }
 
