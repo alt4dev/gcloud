@@ -22,6 +22,7 @@ var options = struct {
 }
 
 var client *logging.Client
+var project string
 
 func init() {
 	SetMode(os.Getenv("ALT4_MODE"))
@@ -33,7 +34,7 @@ func setupClient() {
 		return
 	}
 
-	project := os.Getenv("PROJECT_ID")
+	project = os.Getenv("PROJECT_ID")
 
 	var err error
 	client, err = logging.NewClient(context.Background(), project)

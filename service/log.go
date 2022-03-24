@@ -4,7 +4,7 @@ import (
 	"cloud.google.com/go/logging"
 	"fmt"
 	"github.com/google/uuid"
-	logging2 "google.golang.org/genproto/googleapis/logging/v2"
+	logpb "google.golang.org/genproto/googleapis/logging/v2"
 	"runtime"
 	"strings"
 	"time"
@@ -45,7 +45,7 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 		InsertID:    uuid.New().String(),
 		HTTPRequest: request,
 		Resource:    options.Resource,
-		SourceLocation: &logging2.LogEntrySourceLocation{
+		SourceLocation: &logpb.LogEntrySourceLocation{
 			File:     file,
 			Line:     int64(line),
 			Function: function,
@@ -55,6 +55,12 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 	if details == nil {
 		client.Logger(getThreadId()).Log(entry)
 		return
+	}
+
+	// Set this as continuous operation
+	entry.Operation = &logpb.LogEntryOperation{
+		Id:       details.id,
+		Producer: "github.com/alt4dev/gcloud",
 	}
 
 	levels := []logging.Severity{logging.Default, logging.Info, logging.Debug, logging.Warning, logging.Error, logging.Critical, logging.Alert}
@@ -67,7 +73,7 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 	}
 
 	// Set trace ID to the thread ID
-	entry.Trace = details.id
+	entry.Trace = fmt.Sprintf("projects/%s/traces/%s", project, details.id)
 
 	logger := details.child
 
@@ -75,6 +81,10 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 		logger = details.parent
 		// Set the parent log level to the highest level seen
 		entry.Severity = levels[details.level]
+
+		// Set a parent op as the first and the last
+		entry.Operation.First = true
+		entry.Operation.Last = true
 	}
 
 	logger.Log(entry)
