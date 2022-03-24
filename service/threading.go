@@ -7,7 +7,6 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
-	"time"
 )
 
 /*
@@ -24,7 +23,7 @@ func init() {
 
 type threadDetails struct {
 	id     string
-	start  time.Time
+	level  int
 	parent *logging.Logger
 	child  *logging.Logger
 }
@@ -55,7 +54,7 @@ func InitGroup() {
 	threadId := getThreadId()
 	threads.Store(routineId, &threadDetails{
 		id:     threadId,
-		start:  LogTime(),
+		level:  0,
 		parent: client.Logger(fmt.Sprintf("parent-%s", threadId)),
 		child:  client.Logger(threadId),
 	})

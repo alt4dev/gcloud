@@ -10,6 +10,15 @@ import (
 	"time"
 )
 
+func numLogLevel(level logging.Severity, levels []logging.Severity) int {
+	for k, v := range levels {
+		if level == v {
+			return k
+		}
+	}
+	return -1
+}
+
 // Log Creates a log entry and writes it to Google cloud logging in the background.
 // This function should not be called directly and should instead be used from helper functions under the `log` package.
 func Log(callDepth int, message string, request *logging.HTTPRequest, labels map[string]string, level logging.Severity, logTime time.Time) {
@@ -48,6 +57,15 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 		return
 	}
 
+	levels := []logging.Severity{logging.Default, logging.Info, logging.Debug, logging.Warning, logging.Error, logging.Critical, logging.Alert}
+	numLevel := numLogLevel(level, levels)
+
+	if numLevel > details.level {
+		details.level = numLevel
+		// Update details with the highest loglevel
+		threads.Store(getRoutineId(), details)
+	}
+
 	// Set trace ID to the thread ID
 	entry.Trace = details.id
 
@@ -55,6 +73,8 @@ func Log(callDepth int, message string, request *logging.HTTPRequest, labels map
 
 	if request != nil {
 		logger = details.parent
+		// Set the parent log level to the highest level seen
+		entry.Severity = levels[details.level]
 	}
 
 	logger.Log(entry)
