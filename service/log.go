@@ -193,9 +193,7 @@ func writeGroupLog(details *threadDetails, status int, labels map[string]string)
 	}}
 
 	req := &logpb.WriteLogEntriesRequest{
-		LogName:  details.id,
 		Resource: options.Resource,
-		Labels:   nil,
 		Entries:  []*logpb.LogEntry{pbEntry},
 	}
 

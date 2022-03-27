@@ -53,7 +53,11 @@ func InitGroup(httpRequest *http.Request) time.Time {
 		details := detailsInterface.(*threadDetails)
 		_ = details.logger.Flush()
 		threads.Delete(routineId)
-		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(url, method).Close()`")
+		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(request, nil).Close()`")
+	}
+
+	if httpRequest == nil {
+		emitWarning.Println("Group with a `nil` request. These logs won't be grouped correctly. However each group will have a unique trace which you can use to filter your logs by and will be a member of the same operation.")
 	}
 	threadId := getThreadId()
 	startTime := LogTime()

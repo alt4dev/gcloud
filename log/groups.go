@@ -77,7 +77,7 @@ func (result *GroupResult) SetLabel(key string, value interface{}) *GroupResult 
 }
 
 // Group start a log group for the goroutine that calls this function.
-// A group should be closed after. Use: `defer Group(...).Close()`
+// A group should be closed after. Use: `defer Group(request, nil).Close()`
 func Group(request *http.Request, labels Labels) *GroupResult {
 	service.InitGroup(request)
 	return &GroupResult{

@@ -6,7 +6,7 @@ We stand by the principle of making developers' work easier, being able to debug
 If you write logs through Google Cloud AppEngine python then you get your log requests automatically grouped for you per request by Google.
 This functionality is not available on modern container based servers even the ones running on GCP. If you need the functionality you have to implement it yourself.
 
-This library bridges that gap and provides a familiar API allowing you to easily group your logs.
+This library bridges that gap and provides a familiar API allowing you to easily group your logs. If you need assistance integrating this library reach out to: [me@billcountry.tech](mailto:me@billcountry.tech)
 
 ## Google Cloud Logging Client, [Docs](https://pkg.go.dev/mod/github.com/alt4dev/gcloud)
 
@@ -99,33 +99,6 @@ func main() {
 }
 ```
 
-#### Labels
-Labels are extra data that you want to relate to a log entry but aren't part of the log message.
-This data can be used while filtering for logs from alt4. Claims implement all methods implemented by the `log` package.
-```go
-package main
-import "github.com/alt4dev/gcloud/log"
-
-func main() {
-    log.Labels{
-        "user_id": "user triggering this entry",
-    }.Println("A normal log message")
-
-    log.Labels{
-        "id": "some_id",
-        "name": "Some name here",
-    }.Warning("Just a warning")
-    
-    // You can reuse labels for multiple logs
-    labels := log.Labels{
-        "org": "Test Org",
-    }
-    
-    labels.Debug("Operation one")
-    labels.Error("The Op failed")
-}
-```
-
 #### Grouping
 Grouping can help you resolve issues faster by grouping related logs together.
 Google cloud logging groups logs based on a http request, this library uses goroutines to determine logs in the same request.
@@ -141,8 +114,15 @@ import (
 
 func loggingMiddleWare(next http.Handler) http.Handler {
     return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-        // Start a logging group for this request, Calling `SetRequest` is not necessary
-        defer log.Group(request.URL.String(), request.Method).SetRequest(request).Close()
+		labels := make(map[string]interface{})
+        // Start a logging group for this request
+        group := log.Group(request, labels)
+		defer group.Close()
+		
+		// You can set additional labels to the group or even set the status of the request
+		// These steps are not necessary
+		group.SetLabel("key", "value")
+		group.SetStatus(200)
 
         // All logs after this line will be grouped
 
