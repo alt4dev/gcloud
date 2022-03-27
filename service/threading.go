@@ -2,11 +2,13 @@ package service
 
 import (
 	"cloud.google.com/go/logging"
-	"fmt"
 	"github.com/google/uuid"
+	loggingProto "google.golang.org/genproto/googleapis/appengine/logging/v1"
+	"net/http"
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 )
 
 /*
@@ -22,10 +24,13 @@ func init() {
 }
 
 type threadDetails struct {
-	id     string
-	level  int
-	parent *logging.Logger
-	child  *logging.Logger
+	id          string
+	level       int
+	lines       []*loggingProto.LogLine
+	logger      *logging.Logger
+	lock        *sync.Mutex
+	startTime   time.Time
+	httpRequest *http.Request
 }
 
 func getRoutineId() string {
@@ -42,22 +47,27 @@ func getThreadId() string {
 	return uuid.New().String()
 }
 
-func InitGroup() {
+func InitGroup(httpRequest *http.Request) time.Time {
 	routineId := getRoutineId()
 	if detailsInterface, ok := threads.Load(routineId); ok {
 		details := detailsInterface.(*threadDetails)
-		_ = details.child.Flush()
-		_ = details.parent.Flush()
+		_ = details.logger.Flush()
 		threads.Delete(routineId)
 		emitWarning.Println("Unclosed log group detected. Call `defer group.Close()` after initializing group to avoid memory leaks. Better yet do `defer Group(url, method).Close()`")
 	}
 	threadId := getThreadId()
+	startTime := LogTime()
 	threads.Store(routineId, &threadDetails{
-		id:     threadId,
-		level:  0,
-		parent: client.Logger(fmt.Sprintf("parent-%s", threadId)),
-		child:  client.Logger(threadId),
+		id:          threadId,
+		level:       0,
+		lines:       make([]*loggingProto.LogLine, 0),
+		logger:      client.Logger(threadId),
+		lock:        new(sync.Mutex),
+		startTime:   startTime,
+		httpRequest: httpRequest,
 	})
+
+	return startTime
 }
 
 func getThreadDetails() *threadDetails {
@@ -68,13 +78,17 @@ func getThreadDetails() *threadDetails {
 	return nil
 }
 
-func CloseGroup() {
+func CloseGroup(status int, labels map[string]string) {
 	routineId := getRoutineId()
 	if detailsInterface, ok := threads.Load(routineId); ok {
+		// Delete the thread no matter what happens
+		defer threads.Delete(routineId)
 		details := detailsInterface.(*threadDetails)
+		if details.httpRequest != nil {
+			// Logs are written as a group
+			writeGroupLog(details, status, labels)
+		}
 		// Before closing a group. Wait for all logs to finish writing.
-		_ = details.child.Flush()
-		_ = details.parent.Flush()
-		threads.Delete(routineId)
+		_ = details.logger.Flush()
 	}
 }

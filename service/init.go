@@ -2,8 +2,6 @@
 package service
 
 import (
-	"cloud.google.com/go/logging"
-	"context"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"io"
 	"os"
@@ -21,30 +19,11 @@ var options = struct {
 	Resource: nil,
 }
 
-var client *logging.Client
 var project string
 
 func init() {
-	SetMode(os.Getenv("ALT4_MODE"))
-}
-
-func setupClient() {
-	// Don't create a client during testing or silent Modes
-	if options.Mode == ModeTesting || options.Mode == ModeSilent {
-		return
-	}
-
 	project = os.Getenv("PROJECT_ID")
-
-	var err error
-	client, err = logging.NewClient(context.Background(), project)
-	if err != nil {
-		panic(err)
-	}
-
-	client.OnError = func(err error) {
-		emitError.Println(err)
-	}
+	SetMode(os.Getenv("ALT4_MODE"))
 }
 
 const ModeRelease = "release"
