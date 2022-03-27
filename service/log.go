@@ -2,6 +2,7 @@ package service
 
 import (
 	"cloud.google.com/go/logging"
+	"context"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
@@ -191,7 +192,30 @@ func writeGroupLog(details *threadDetails, status int, labels map[string]string)
 		Value:   protocBytes,
 	}}
 
-	details.logger.Log(entry)
+	req := &logpb.WriteLogEntriesRequest{
+		LogName:  details.id,
+		Resource: options.Resource,
+		Labels:   nil,
+		Entries:  []*logpb.LogEntry{pbEntry},
+	}
+
+	retriedWrite(req, 0)
+}
+
+func retriedWrite(req *logpb.WriteLogEntriesRequest, retries int) {
+	if retries >= 10 {
+		emitError.Print("Unable to write log entry to google cloud logging")
+		emitError.Print(req.Entries[0])
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	_, err := pbClient.WriteLogEntries(ctx, req)
+	if err != nil {
+		client.OnError(err)
+		retriedWrite(req, retries+1)
+	}
 }
 
 func emitLog(message string, labels map[string]string, level logging.Severity, logTime time.Time, file string, line int) {
