@@ -2,6 +2,7 @@ package service
 
 import (
 	"cloud.google.com/go/logging"
+	"fmt"
 	"github.com/google/uuid"
 	loggingProto "google.golang.org/genproto/googleapis/appengine/logging/v1"
 	"net/http"
@@ -61,11 +62,17 @@ func InitGroup(httpRequest *http.Request) time.Time {
 	}
 	threadId := getThreadId()
 	startTime := LogTime()
+
+	var logger *logging.Logger = nil
+	// Don't try to create a logger in testing/silent mode
+	if options.Mode == ModeDebug || options.Mode == ModeRelease {
+		logger = client.Logger(threadId)
+	}
 	threads.Store(routineId, &threadDetails{
 		id:          threadId,
 		level:       0,
 		lines:       make([]*loggingProto.LogLine, 0),
-		logger:      client.Logger(threadId),
+		logger:      logger,
 		lock:        new(sync.Mutex),
 		startTime:   startTime,
 		httpRequest: httpRequest,
@@ -88,6 +95,10 @@ func CloseGroup(status int, labels map[string]string) {
 		// Delete the thread no matter what happens
 		defer threads.Delete(routineId)
 		details := detailsInterface.(*threadDetails)
+		if options.Mode == ModeSilent || options.Mode == ModeTesting {
+			emitLog(fmt.Sprintf(""), labels, levels[details.level], LogTime(), "", 0)
+			return
+		}
 		if details.httpRequest != nil {
 			// Logs are written as a group
 			writeGroupLog(details, status, labels)
