@@ -193,8 +193,10 @@ func writeGroupLog(details *threadDetails, status int, labels map[string]string)
 	}}
 
 	req := &logpb.WriteLogEntriesRequest{
-		Resource: options.Resource,
-		Entries:  []*logpb.LogEntry{pbEntry},
+		LogName:        fmt.Sprintf("projects/%s/logs/%s", project, details.id),
+		Resource:       options.Resource,
+		Entries:        []*logpb.LogEntry{pbEntry},
+		PartialSuccess: true,
 	}
 
 	retriedWrite(req, 0)
