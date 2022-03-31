@@ -163,7 +163,7 @@ func writeGroupLog(details *threadDetails, status int, labels map[string]string)
 		EndTime:       timestamppb.Now(),
 		Latency:       durationpb.New(entry.HTTPRequest.Latency),
 		Method:        request.Method,
-		Resource:      request.URL.RawPath,
+		Resource:      request.URL.Path,
 		Status:        int32(status),
 		ResponseSize:  0,
 		Referrer:      request.Referer(),
